@@ -1,0 +1,3 @@
+##Abstract
+
+Performing Distance-Based Outlier Analysis on Large Datasets poses a challenge with respect to computation time. Due to its $n\log(n)$ complexity, the kd-tree based algorithm for $k$-nearest neighbor search is not applicable for interactive outlier exploration over data sets whose sizes ranges in the millions. In this paper, we present a system that preprocesses the results of an initial application of the standard algorithm and stores them in memory to efficiently support any following outlier detection queries and also two novel outlier analysis operations that allow data analysts to gain insight into the outlier status of relevant parts of the data set much mor quickly than the traditional approach of repeatedly finding $k$-nearest neighbors would.
