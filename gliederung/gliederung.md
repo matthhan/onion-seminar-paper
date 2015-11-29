@@ -1,0 +1,20 @@
+#Online Outlier Exploration over Large Datasets
+     -Motivation
+         -Outlier Definitions
+         -State of the Art for Distance-Based Outliers
+         -Considerations For A Better Outlier Detection System
+     -Overview of the ONION System
+         -Offline Phase
+         -Online Phase
+     -Offline Phase
+         -O-Space
+         -P-Space
+         -D-Space
+     -Online Phase
+         -Outlier Detection
+         -Comparative Outlier Analytics
+         -Outlier-Centric Parameter Space Exploration
+     -Evaluation
+         -Offline Phase
+         -Online Phase
+     -Summary
