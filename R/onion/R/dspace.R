@@ -124,3 +124,21 @@ detect_outliers_dspace <- function(dspace,eps,k,ospace) {
   assignmentvector[assignmentvector=="outlier_candidate"] <- "outlier"
   return(assignmentvector)
 }
+#'@export
+comparative_outlier_analytics_dspace <- function(dspace,input_set) {
+    last <- function(vec){return(vec[length(vec)])}
+    #Note this part of the algorithm is currently linear in the number of outliers
+    weakest_outlier <- sapply(dspace$domination_forest,function(domtree){last(which(sapply(domtree,function(node){node%in%input_set})))})
+    #replace integer(0) by 0
+    weakest_outlier <- sapply(weakest_outlier,function(wo){if(length(wo)==0){return(0)}else{return(wo)}})
+    #Get all outliers after the weakest outlier in the domtrees
+    weakest_outlier <- weakest_outlier + 1
+    outliers_by_domtree <- lapply(1:length(weakest_outlier),function(index){
+      if(weakest_outlier[index]==1){return(NA)}
+      domtree <- dspace$domination_forest[index]
+      domtree[(weakest_outlier[index]):length(domtree)]
+    })
+    comparative_outliers <- unlist(outliers_by_domtree)
+    comparative_outliers <- comparative_outliers[!is.na(comparative_outliers)]
+    return(unique(comparative_outliers))
+}
