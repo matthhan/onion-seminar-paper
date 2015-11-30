@@ -8,4 +8,15 @@ data/*
 Papers/*
 gliederung/*.pdf
 ausarbeitung/*.pdf
+ausarbeitung/*.aux
+ausarbeitung/*.log
+ausarbeitung/*.blg
+ausarbeitung/*.bbl
+ausarbeitung/*.sty
+ausarbeitung/*.cls
+ausarbeitung/*.dem
+ausarbeitung/*.dvi
+ausarbeitung/*.ind
+ausarbeitung/*.bst
+ausarbeitung/*.doc
 *.tar.gz
