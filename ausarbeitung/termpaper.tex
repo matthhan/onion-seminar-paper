@@ -1,0 +1,65 @@
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage{makeidx}  % allows for indexgeneration
+%
+\begin{document}
+%
+%\frontmatter          % for the preliminaries
+%
+%\pagestyle{headings}  % switches on printing of running heads
+%
+%
+%\mainmatter              % start of the contributions
+%
+\title{Online Outlier Detection over Large Datasets}
+\titlerunning{Online Outlier Detection}  % abbreviated title (for running head)
+\subtitle{Seminar - Multimedia Retrieval and Data Mining}
+%
+\author{Matthias Hansen}
+\authorrunning{Hansen} % abbreviated author list (for running head)
+%
+%
+\institute{Data Management and Data Exploration Group\\
+RWTH Aachen University\\
+Germany\\
+\email{matthias.hansen@rwth-aachen.de}}
+
+\maketitle              % typeset the title of the contribution
+
+\begin{abstract}
+Performing Distance-Based Outlier Analysis on Large Datasets poses a challenge with respect to computation time. Due to its $n\log(n)$ complexity, the kd-tree based algorithm for $k$-nearest neighbor search is not applicable for interactive outlier exploration over data sets whose sizes ranges in the millions. In this paper, we present a system that preprocesses the results of an initial application of the standard algorithm and stores them in memory to efficiently support any following outlier detection queries and also two novel outlier analysis operations that allow data analysts to gain insight into the outlier status of relevant parts of the data set much more quickly than the traditional approach of repeatedly finding $k$-nearest neighbors would.
+\end{abstract}
+
+\section{Motivation}
+%TODO: expand this paragraph
+Finding outliers in data is a problem frequently occured in data analysis. For example credit card providers use outlier detection to find transactions that could be fraudulent. Similarly, in a network security context, outlier detection can be used to identify intruders. It has also been used for goals as diverse as data cleaning, financial planning and severe weather prediction.
+
+\subsection{Outlier Definitions}
+
+There is no universally accepted precise definition of what constitutes an outlier in a data set. Instead, several different definitions are used as appropriate for the task at hand.
+
+Traditionally, outliers have been defined statistically, i.e. with respect to a statistical distribution. In this case, every data point to which the distribution assigns a probability below some threshold is classified as an outlier. However, this is only applicable if those points that are not outliers are known to follow a specific distribution. This is not always the case and choosing a statistical distribution so that it reflects the data set is challenging and may require domain knowledge and--especially for multivariate data knowledge about statistics.
+
+A competing outlier definition is the distance-based outlier. A point is a distance-based outlier if its $\varepsilon$-neighborhood with respect to a distance measure contains less than $k$ points, where $\varepsilon$, $k$ and the distance measure can be chosen as necessary for the task at hand.
+
+\begin{definition}
+    Let DB be a set of tuples. A data point $p\in DB$ is an outlier iff 
+    $|\{q \in DB | d(p,q) < \varepsilon\}| < k$.
+\end{definition}
+
+This definition has is impartial to the distribution of the data and it is especially useful for geospatial data, where the Euclidean distance has additional meaning apart from an indication of (dis-)similarity. Drawbacks of this definition include inability to cope with arbitrarily high-dimensional data, since the distances of the most-distant and the least-distant points approach each other as the dimensionality of data set grows--a phenomenon referred to as the curse of dimensionality. %TODO cite that one paper about curse of dimensionality.
+%TODO Improve this paragraph?
+
+
+
+Example citation \cite{DBLP:conf/civr/BeecksUS10}
+
+%
+% ---- Bibliography ----
+%
+
+\bibliographystyle{abbrv}
+\bibliography{references}  
+
+\end{document}
