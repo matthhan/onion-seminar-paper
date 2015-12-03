@@ -32,8 +32,8 @@ Performing Distance-Based Outlier Analysis on Large Datasets poses a challenge w
 \end{abstract}
 
 \section{Motivation}
-%TODO: expand this paragraph
 Finding outliers in data is a problem frequently occured in data analysis. For example credit card providers use outlier detection to find transactions that could be fraudulent. Similarly, in a network security context, outlier detection can be used to identify intruders. It has also been used for goals as diverse as data cleaning, financial planning and severe weather prediction.
+%TODO: expand this paragraph
 
 \subsection{Outlier Definitions}
 
@@ -48,9 +48,23 @@ A competing outlier definition is the distance-based outlier. A point is a dista
     $|\{q \in DB | d(p,q) < \varepsilon\}| < k$.
 \end{definition}
 
-This definition has is impartial to the distribution of the data and it is especially useful for geospatial data, where the Euclidean distance has additional meaning apart from an indication of (dis-)similarity. Drawbacks of this definition include inability to cope with arbitrarily high-dimensional data, since the distances of the most-distant and the least-distant points approach each other as the dimensionality of data set grows--a phenomenon referred to as the curse of dimensionality. %TODO cite that one paper about curse of dimensionality.
+This definition has is impartial to the distribution of the data and it is especially useful for geospatial data, where the Euclidean distance has additional meaning apart from indicating (dis-)similarity. Drawbacks of this definition include inability to cope with arbitrarily high-dimensional data, since the distances of the most-distant and the least-distant points approach each other as the dimensionality of data set grows--a phenomenon referred to as the curse of dimensionality. %TODO cite that one paper about curse of dimensionality.
 %TODO Improve this paragraph?
 
+\subsection{State of the Art}
+
+The naive way to detect distance-based outliers is to simply compute the distances between each pair of points. From the resulting distance matrix, the k-th closest other point for every point $p_i$ can be found by scanning $p_i$'s row in the distance matrix. Then one has to check whether the distance to this k-th closest point is bigger than $\varepsilon$. If this is the case, then $p_i$ is an outlier.
+
+The time and space complexities of this algorithm are both in $\mathcal{O}((n\cdot d)^2)$ ($n$ being the number of rows and $d$ the number of columns in the DB), so the algorithm does not scale well for large amounts of data.
+
+Faster algorithms to solve this problem are usually based on spatial index structures. For example, a kd-tree based algorithm exists that essentially solves this problem in $\mathcal{O}(n\cdot d \cdot\log(n\cdot d))$, by first finding the $k$-nearest neighbors of each $p_i$ and then comparing the distance to the $k$-th nearest neighbor to $\varepsilon$ to find out whether $p_i$ is an outlier. 
+
+This algorithm clearly performs better for large datasets. However in our experiments we found that for e.g. a two-dimensional dataset with . %TODO insert values here
+
+This is not a big problem if only one isolated outlier detection query has to be performed. However, a typical use case for outlier detection is exploratory data analysis, where it is not clear ahead of time whether one set of parameters ($k$,$\varepsilon$) produces the desired result. An analyst might, for example, run an outlier detection query with a value of $k$ that is very high, wait a long time for the result, and then find out that the outlier detection algorithm has classified every point as an outlier. They would then have to re-run the outlier detection algorithm with a different set of parameters, completely recomputing the $k$-nearest neighbors in the process.
+%TODO Add experimental results here
+%TODO: Also discuss the DOLPHIN System.
+\subsection{Considerations for a New Outlier Detection System}
 
 
 Example citation \cite{DBLP:conf/civr/BeecksUS10}
