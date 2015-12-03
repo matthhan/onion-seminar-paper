@@ -20,3 +20,4 @@ ausarbeitung/*.ind
 ausarbeitung/*.bst
 ausarbeitung/*.doc
 *.tar.gz
+*.un~
