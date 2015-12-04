@@ -95,6 +95,30 @@ Algorithms to solve these problems would allow analysts to use knowledge about t
 Similarly, the analyst might also know from a statistic maintained by their business that a certain percentage of transactions is fraudulent. They could apply PSE to a set of known fraudulent transactions and set delta such that the returned parameter settings produce outlier sets with a size of that percentage compared to the data set.
 
 To conclude, a new outlier detection system should take ranges instead of fixed values for $\varepsilon$ and $k$ and use these to support efficient outlier detection queries within these ranges as well as the other outlier operations we presented.
+\section{Overview of the ONION System}
+The ONION system addresses the considerations of the previous section by splitting the Outlier Analysis task into an offline and an online phase. 
+
+In the offline phase, an initial knn query is performed and the result is processed into a series of three data structures: \emph{O-Space}, \emph{P-Space} and \emph{D-Space}, each of them adding to computation time.
+
+In the online phase, Outlier Detection, Comparative Outlier Analytics and Outlier-Centric Parameter Space Exploration queries can be issued by the user. These queries can be processed by consulting the data structures computed in the offline phase without referring to the original data set.
+
+The ONION system takes its name from this \underline{on}line outlier detect\underline{ion} concept.
+
+\subsection{Offline Phase}
+
+The offline phase consists of the creation of three data structures in order:
+
+\begin{itemize}
+ \item O-Space (ONION Space) is a data structure obtained by carrying out a $k$nn search and then saving the results, discarding unnecessary information.
+ \item P-Space (Parameter Space) is created by sorting the knn results by the computed distance value for each value of k. This results in an ordered list of valuees to which binary-search style algorithms can be applied for more efficient outlier detection.
+ \item D-Space (Domination Space) is based on a \emph{domination} relation, in which one point is said to dominate another if every parameter setting that marks it as an outlier also marks the other as an outlier. This relation typically holds among most data points and information about this relation can be encoded within a list of trees (or \emph{forest}).
+\end{itemize}
+
+It is important to note that not the entire offline phase has to be performed to allow for use of the ONION system. All of the three outlier analysis operations can be carried out using any one of these data structures, however the more of this preprocessing is performed, the faster subsequent outlier queries can be performed. Depending on the data set and parameter values, the creation of \emph{O-Space} might e.g. take much long than e.g. \emph{D-Space}, in which case it might be advisable to carry out the whole offline phase. In other cases the computation of \emph{D-Space} is going to be entirely uneconomical.
+
+Also, \emph{P-Space} consists of the exact same data as \emph{O-Space}, which means that once \emph{P-Space} is computed, \emph{O-Space} can be discarded to free up memory.
+\subsection{Online Phase}
+
 
 Example citation \cite{DBLP:conf/civr/BeecksUS10}
 
