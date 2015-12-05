@@ -115,14 +115,23 @@ It is important to note that not the entire offline phase has to be performed to
 
 Also, \emph{P-Space} consists of the exact same data as \emph{O-Space}, which means that once \emph{P-Space} is computed, \emph{O-Space} can be discarded to free up memory.
 Example citation \cite{DBLP:conf/civr/BeecksUS10}
-    \subsection{O-Space}
-    O-Space is computed by carrying out a modified knn query with the parameter $k_{max}$. Specifically  the knn search for each point $p_i$ is modified by aborting once $k_{max}$ points whose distance to $p_i$ is smaller than $\varepsilon_{min}$ have been found because once this condition is known to hold, it is clear that $p_i$ will always be an inlier under any single parameter setting $(k,\varepsilon), \text{where} k_{min}\leq k \leq k_{max},\; \varepsilon_{min}\leq \varepsilon \leq \varepsilon_{max}$. Under the assumption that most points will be such \emph{const inliers}, this modification reduces the running time of the knn search. Otherwise, any knn algorithm can be used, even e.g. approximate algorithms if computation time is a big issue.
+\subsection{O-Space}
+O-Space is computed by carrying out a modified knn query with the parameter $k_{max}$. Specifically  the knn search for each point $p_i$ is modified by aborting once $k_{max}$ points whose distance to $p_i$ is smaller than $\varepsilon_{min}$ have been found because once this condition is known to hold, it is clear that $p_i$ will always be an inlier under any single parameter setting $(k,\varepsilon), \text{where} k_{min}\leq k \leq k_{max},\; \varepsilon_{min}\leq \varepsilon \leq \varepsilon_{max}$. Under the assumption that most points will be such \emph{const inliers}, this modification reduces the running time of the knn search. Otherwise, any knn algorithm can be used, even e.g. approximate algorithms if computation time is a big issue.
 
-    Similarly, once the knn search has finished, all $p_i$ whose $k_{max}$-th nearest neighbor's distance to them is larger than $\varepsilon_{max}$ can be labeled as \emph{const outliers}.
+Similarly, once the knn search has finished, all $p_i$ whose distance to their $k_{max}$-th nearest neighbor is larger than $\varepsilon_{max}$ can be labeled as \emph{const outliers}.
 
-    The remaining points are labeled \emph{outlier candidates} (OCs) and only for these do the knn results play any further role. However, the distances to the $[1,k_{min}-1]$-th nearest neighbors can still be discarded.
+The remaining points are labeled \emph{outlier candidates} and only for these do the knn results play any further role.  However, the distances to the $[1,k_{min}-1]$-th nearest neighbors for each outlier candidate can still be discarded. We denote the set of outlier candidates by $OC$.
 
     An example will be given to illustrate this:
+The complexity of this \emph{O-Space} construction is dominated by the time needed to compute the knn and therefore depends on the algorithm used for knn search (ideally one that can be performed in $n \cdot log(n)$ time), since all other operations needed to construct \emph{O-Space} can be carried out in linear time.
+%TODO: Add example
+\subsection{P-Space}
+\emph{P-Space} can be computed from O-Space by sorting the distances in each column of the \emph{O-Space} table in ascending order, to allow for binary-search-like processing, reducing the runtime of some of the outlier analysis operations from linear to logarithmic time. Using any efficient sorting algorithm, this can be done in $k \cdot |OC| \cdot log(|OC|)$ time. 
+
+In order to still be able to identify which distance belongs to which outlier candidate after sorting, the index of the outlier candidate has to be carried along into each cell of the table.
+
+We provide an example based on the example \emph{O-Space} computation from the previous section:
+
 
 %
 % ---- Bibliography ----

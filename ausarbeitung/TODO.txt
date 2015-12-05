@@ -7,4 +7,5 @@ speed up creation of domination graph. Possibly implement in c++?
 Add papers to bibtex
 --------------------------------------------
 add citations in paper
-
+--------------------------------------------
+add examples
