@@ -31,11 +31,9 @@ Germany\\
 \begin{abstract}
 Performing Distance-Based Outlier Analysis on Large Datasets poses a challenge with respect to computation time. Due to its $n\log(n)$ complexity, the kd-tree based algorithm for $k$-nearest neighbor search is not applicable for interactive outlier exploration over data sets whose sizes ranges in the millions. In this paper, we present a system that preprocesses the results of an initial application of the standard algorithm and stores them in memory to efficiently support any following outlier detection queries and also two novel outlier analysis operations that allow data analysts to gain insight into the outlier status of relevant parts of the data set much more quickly than the traditional approach of repeatedly finding $k$-nearest neighbors would.
 \end{abstract}
-
 \section{Motivation}
 Finding outliers in data is a problem frequently occured in data analysis. For example credit card providers use outlier detection to find transactions that could be fraudulent. Similarly, in a network security context, outlier detection can be used to identify intruders. It has also been used for goals as diverse as data cleaning, financial planning and severe weather prediction.
 %TODO: expand this paragraph
-
 \subsection{Outlier Definitions}
 
 There is no universally accepted precise definition of what constitutes an outlier in a data set. Instead, several different definitions are used as appropriate for the task at hand.
@@ -53,7 +51,6 @@ A competing outlier definition is the distance-based outlier. A point is a dista
 
 This definition is impartial to the distribution of the data and it is especially useful for geospatial data, where the Euclidean distance has additional meaning apart from indicating (dis-)similarity. Drawbacks of this definition include inability to cope with arbitrarily high-dimensional data, since the distances of the most-distant and the least-distant points approach each other as the dimensionality of data set grows--a phenomenon referred to as the curse of dimensionality. %TODO cite that one paper about curse of dimensionality.
 %TODO Improve this paragraph?
-
 \subsection{State of the Art}
 
 The naive way to detect distance-based outliers is to simply compute the distances between each pair of points. From the resulting distance matrix, the k-th closest other point for every point $p_i$ can be found by scanning $p_i$'s row in the distance matrix. Then one has to check whether the distance to this k-th closest point is bigger than $\varepsilon$. If this is the case, then $p_i$ is an outlier.
@@ -96,15 +93,15 @@ Similarly, the analyst might also know from a statistic maintained by their busi
 
 To conclude, a new outlier detection system should take ranges instead of fixed values for $\varepsilon$ and $k$ and use these to support efficient outlier detection queries within these ranges as well as the other outlier operations we presented.
 \section{Overview of the ONION System}
-The ONION system addresses the considerations of the previous section by splitting the Outlier Analysis task into an offline and an online phase. 
+The ONION system addresses the considerations of the previous section by having the user provide a parameter set $(k_{min},k_{max},\varepsilon_{min},\varepsilon_{max})$ instead of single values for $k$ and $\varepsilon$ and splitting the Outlier Analysis task into an offline and an online phase.
 
 In the offline phase, an initial knn query is performed and the result is processed into a series of three data structures: \emph{O-Space}, \emph{P-Space} and \emph{D-Space}, each of them adding to computation time.
 
 In the online phase, Outlier Detection, Comparative Outlier Analytics and Outlier-Centric Parameter Space Exploration queries can be issued by the user. These queries can be processed by consulting the data structures computed in the offline phase without referring to the original data set.
 
-The ONION system takes its name from this \underline{on}line outlier detect\underline{ion} concept.
+The ONION system takes its name from this \underline{on}line outlier detect\underline{ion} approach.
 
-\subsection{Offline Phase}
+\section{Offline Phase}
 
 The offline phase consists of the creation of three data structures in order:
 
@@ -117,10 +114,15 @@ The offline phase consists of the creation of three data structures in order:
 It is important to note that not the entire offline phase has to be performed to allow for use of the ONION system. All of the three outlier analysis operations can be carried out using any one of these data structures, however the more of this preprocessing is performed, the faster subsequent outlier queries can be performed. Depending on the data set and parameter values, the creation of \emph{O-Space} might e.g. take much long than e.g. \emph{D-Space}, in which case it might be advisable to carry out the whole offline phase. In other cases the computation of \emph{D-Space} is going to be entirely uneconomical.
 
 Also, \emph{P-Space} consists of the exact same data as \emph{O-Space}, which means that once \emph{P-Space} is computed, \emph{O-Space} can be discarded to free up memory.
-\subsection{Online Phase}
-
-
 Example citation \cite{DBLP:conf/civr/BeecksUS10}
+    \subsection{O-Space}
+    O-Space is computed by carrying out a modified knn query with the parameter $k_{max}$. Specifically  the knn search for each point $p_i$ is modified by aborting once $k_{max}$ points whose distance to $p_i$ is smaller than $\varepsilon_{min}$ have been found because once this condition is known to hold, it is clear that $p_i$ will always be an inlier under any single parameter setting $(k,\varepsilon), \text{where} k_{min}\leq k \leq k_{max},\; \varepsilon_{min}\leq \varepsilon \leq \varepsilon_{max}$. Under the assumption that most points will be such \emph{const inliers}, this modification reduces the running time of the knn search. Otherwise, any knn algorithm can be used, even e.g. approximate algorithms if computation time is a big issue.
+
+    Similarly, once the knn search has finished, all $p_i$ whose $k_{max}$-th nearest neighbor's distance to them is larger than $\varepsilon_{max}$ can be labeled as \emph{const outliers}.
+
+    The remaining points are labeled \emph{outlier candidates} (OCs) and only for these do the knn results play any further role. However, the distances to the $[1,k_{min}-1]$-th nearest neighbors can still be discarded.
+
+    An example will be given to illustrate this:
 
 %
 % ---- Bibliography ----
