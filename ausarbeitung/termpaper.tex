@@ -131,7 +131,20 @@ The complexity of this \emph{O-Space} construction is dominated by the time need
 In order to still be able to identify which distance belongs to which outlier candidate after sorting, the index of the outlier candidate has to be carried along into each cell of the table.
 
 We provide an example based on the example \emph{O-Space} computation from the previous section:
+\subsection{D-Space}
+\emph{P-Space}, supports OD queries efficiently. However, CO can still not be computed easily based just on the \emph{P-Space} data structure. This is because outlier detection requires checking for each value of $k \in [k_{min},k_{max}]$ whether a particular point $p_i$ is an outlier if another point $p_j$ is an outlier. We introduce some terminology to tackle this problem:
+\begin{definition}[k-domination]
+Let $p_i,q_j \in OC;\; k\in [k_{min},k_{max}]$. We say that $p_i$ $k$-dominates $p_j$, $p_j \leq_{k} p_i$ iff. $\forall\varepsilon(p_i in OD_{(k,\varepsilon)} \implies p_j in OD_{(k,\varepsilon)})$
+\end{definition}
+\begin{definition}[domination]
+Let $p_i,q_j \in OC$. We say that $p_i$ dominates $p_j$, $p_j \leq p_i$ iff. $\forall k\in [k_{min},k_{max}](p_j \leq_k p_i)$
+\end{definition}
+\begin{definition}[Domination Graph]
+The domination graph is the undirected graph created by the domination relation. Each outlier candidate is represented in the Domination graph as a node. Two nodes representing points $p_i$ and $p_j$ are connected by an edge iff. $p_i \leq p_j \vee p_j \leq p_i$.
+\end{definition}
+Since the domination relation is transitive and represented symmetrically in the graph, any set of outlier candidates among which the domination relation holds in one direction or the other forms a subgraph, which is \emph{complete}, i.e. every pair of nodes is connected. To simplify CO, it would be useful to split the domination graph into a maximal set of complete subgraphs and order the points belonging to each subgraph w.r.t. the domination relationship. This could allow for logarithmic complexity outlier detection. However, the detection of maximal complete subgraphs (so called \emph{cliques}) is a known NP-complete problem. Once each \emph{clique} has been found, sorting their nodes in such a way that they are ordered by domination can be done as usual. 
 
+Clearly, the time complexity of \emph{D-Space} construction is dominated by the NP-complete component. Therefore, \emph{D-Space} can only be constructed within a reasonable amount of time if the amount of outlier candidates is very small.
 
 %
 % ---- Bibliography ----
