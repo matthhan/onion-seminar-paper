@@ -142,9 +142,33 @@ Let $p_i,q_j \in OC$. We say that $p_i$ dominates $p_j$, $p_j \leq p_i$ iff. $\f
 \begin{definition}[Domination Graph]
 The domination graph is the undirected graph created by the domination relation. Each outlier candidate is represented in the Domination graph as a node. Two nodes representing points $p_i$ and $p_j$ are connected by an edge iff. $p_i \leq p_j \vee p_j \leq p_i$.
 \end{definition}
-Since the domination relation is transitive and represented symmetrically in the graph, any set of outlier candidates among which the domination relation holds in one direction or the other forms a subgraph, which is \emph{complete}, i.e. every pair of nodes is connected. To simplify CO, it would be useful to split the domination graph into a maximal set of complete subgraphs and order the points belonging to each subgraph w.r.t. the domination relationship. This could allow for logarithmic complexity outlier detection. However, the detection of maximal complete subgraphs (so called \emph{cliques}) is a known NP-complete problem. Once each \emph{clique} has been found, sorting their nodes in such a way that they are ordered by domination can be done as usual. 
+
+Since the domination relation is transitive and represented symmetrically in the graph, any set of outlier candidates among which the domination relation holds in one direction or the other forms a subgraph, which is \emph{complete}, i.e. every pair of nodes is connected. To simplify CO, it would be useful to split the domination graph into a maximal set of complete subgraphs and order the points belonging to each subgraph w.r.t. the domination relationship. This could allow for logarithmic complexity outlier detection. However, the detection of maximal complete subgraphs (so called \emph{cliques}) is a known NP-complete problem. Once each \emph{clique} has been found, sorting their nodes in such a way that they are ordered by domination can be done easily. 
 
 Clearly, the time complexity of \emph{D-Space} construction is dominated by the NP-complete component. Therefore, \emph{D-Space} can only be constructed within a reasonable amount of time if the amount of outlier candidates is very small.
+\section{Online Phase}
+
+Once one of the data structures has been computed outlier analysis can be carried out. 
+
+\subsection{Outlier Detection}
+
+Outlier detection can be carried out with the \emph{O-Space} data structure by checking all entries for the selected value of $k$. If their distance is above the selected value for $\varepsilon$, the the respective point is an outlier. Since only Outlier Candidates have to be checked, the time complexity of this algorithm is in $\mathcal{O}(|OC|)$, where the set $OC$ might be only slightly smaller or several orders of magnitude smaller than the original DB, depending on the ranges for $k$ and $\varepsilon$.
+
+Using \emph{P-Space} allows for the use of binary search instead of a scan over the data. Since the distance values are sorted, the search can begin in the middle of the list of distances and then be continued in such a way that the first element that is an outlier will be found. All elements after this one are then confirmed to be outliers. This algorithm's complexity is then in $\log(|OC|)$, which should be quite sufficient even for very large datasets.
+
+Using \emph{D-Space} for this task is actually slightly worse: The sorted domination lists which \emph{D-Space} is composed of have to be searched in a similar algorithm as \emph{P-Space}, so the complexity is logarithmic, but the logarithm has to be applied on each individual list's length. Let $n_1 \ldots n_j$ be the lengths of the list, then this algorithm is in $\mathcal{O}(\log(n_1) + \ldots + \log(n_j)) = \mathcal{O}(\log(n_1 \cdot \ldots \cdot \log(n_j))$. Since $|OC|$ is the sum of the lengths of the lists, this is slower than the \emph{P-Space}-based algorithm described above.
+
+\subsection{Comparative Outlier Analytics}
+
+To find the set of comparative outliers $Q$ for one set of input points $Q$, using only the \emph{O-Space} data structure, the entries of the table for each $k$ have to be scanned to obtain the distance values for each point $p_i\in P$ and then all points in that row whose distance is larger than that for the $p_i$ with the largest distance have to be saved. After these sets have been computed for each $k$, their intersection has to be determined. This intersection is the set Q that forms the result. Since the entire table has to be scanned, the time complexity of this algorithm is in $\mathcal{O}(k\cdot |OC|)$.
+
+\emph{P-Space} offers a straightforward improvement on this algorithm: since the distances for each $k$ are sorted, the part of the scan that considers each outlier candidate can be done in logarithmic time. Thus, time complexity will be in $\mathcal{O}(k\cdot \log(|OC|))$.
+
+Using \emph{O-Space} further reduces this complexity: Since it contains information about the domination relationship independent of the value of $k$, one only needs to search the domination lists for the weakest outlier in the input set $P$. All points preceding this point are then clearly comparative outliers. Since the domination lists are ordered, this search can be performed in logarithmic time, i.e. $\mathcal{O}(\log(n_1) + \ldots + \log(n_j))$, where $n_1, \ldots , n_j$ are the lengths of the domination lists as above.
+
+\subsection{Outlier-Centric Parameter Space Exploration}
+
+
 
 %
 % ---- Bibliography ----
