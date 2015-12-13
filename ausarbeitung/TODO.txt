@@ -9,3 +9,7 @@ Add papers to bibtex
 add citations in paper
 --------------------------------------------
 add examples
+-------------------------------------------
+Change chapter after PSE
+-------------------------------------------
+Also include LOF

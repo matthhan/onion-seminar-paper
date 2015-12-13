@@ -1,5 +1,5 @@
 setwd("~/Desktop/Seminar/R")
 source("preprocess_rossmann.R")
-system.time(ospace <- construct_ospace(data[c("Sales","CompetitionDistance")],k=c(4,6),eps=c(0.2,0.5)))
+system.time(ospace <- construct_ospace(data[c("Sales","CompetitionDistance")],k=c(2,20),eps=c(0.2,0.5)))
 system.time(pspace <- construct_pspace(ospace))
 system.time(dspace <- construct_dspace(pspace))

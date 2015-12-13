@@ -44,3 +44,11 @@ comparative_outlier_analytics_ospace <- function(ospace,set_of_ocs) {
   return(ospace$oc_ids[relative_outliers_forall_k])
   
 }
+outlier_centric_parameter_space_exploration_ospace <- function(ospace,input_set) {
+  parameter_settings <- list()
+  for(k in 1:ncol(ospace$space_delimiter)) {
+    input_set_correct_indexes <- which(sapply(ospace$oc_ids,function(oc_id){any(oc_id==input_set)}))
+    epsilon <- max(ospace[input_set_correct_indexes,k])
+    parameter_settings[[k]] <- list(k=k,eps=epsilon)
+  }
+}
