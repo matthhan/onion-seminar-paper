@@ -7,5 +7,7 @@ Authors@R: c(person("Matthias", "Hansen", role="cre",email="matthias.hansen@rwth
 Description: Efficiently performs online distance-based outlier detection and two other 
   operations using a knowledge base generated in an initial offline phase.
 License: GPL
-Imports: RANN (>= 2.5), igraph (>= 1.0.1), ggplot2 (>= 1.0.1)
+Imports: RANN (>= 2.5), igraph (>= 1.0.1), ggplot2 (>= 1.0.1), Rcpp
+LinkingTo: Rcpp
 RoxygenNote: 5.0.1
+

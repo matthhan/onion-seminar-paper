@@ -1,11 +1,15 @@
 
 #'@export 
+#Import something from Rcpp. We do not use this function but we have to import
+#something from Rcpp, otherwise calling into cpp does not work
+#'@importFrom Rcpp sourceCpp
+#Import the igraph package to be able to use a fast algorithm for the CLIQUES
+#problem
+#'@import igraph
+#'@useDynLib Onion
 construct_dspace <- function(pspace) {
-  print("building domination graph")
   domination_graph <- build_domination_graph(pspace)
-  print("creating graph object")
   graph_object <- igraph::graph_from_adjacency_matrix(domination_graph,mode="undirected")
-  print("executing cliques algorithm")
   cliques <- igraph::max_cliques(graph_object)  
   cliques <- lapply(cliques,as.numeric)
   domination_groups <- lapply(cliques,function(clique){pspace$oc_ids[clique]})
@@ -36,57 +40,19 @@ construct_dspace <- function(pspace) {
                                         assignment=pspace$assignment)))
 }
 
-#Creates a domination Graph. Note that the domination Graphs we use are
-#different from the ones in the paper: our dominations graphs have an edge
-#between two ocs a, b, iff a dominates b or b dominates a. Their domination
-#graphs have an edge if this is not the case.
-#'@import igraph
-#'@export
+#The actual domination graph construction is implemented in C++ because the 
+#previous R implementation took far too long. For e.g. 100000 2d data points,
+#the R implementation took 2 minutes, while the cpp implementation was finished
+#in half a second
 build_domination_graph <- function(pspace) {
-  #Returns True iff the i-th outlier candidate comes before the j-th outlier
-  #candidate in the k-th list
-  k_dominates <- function(i,j,k,pspace) {
-    k_th_list <- pspace$p_space[[k]]
-    for(index in 1:length(k_th_list)) {
-      pnode <- k_th_list[[index]]
-      if(pnode[1] == pspace$oc_ids[i]) return(T) #pnode[1] is the oc_id of the pnode
-      if(pnode[1] == pspace$oc_ids[j]) return(F)
-    }
-  }
-  #Returns True iff i k-dominates j for all k in [kmin,kmax]
-  dominates  <- function(i,j,pspace) {
-    for(index in 1:length(pspace$p_space)) {
-      if(!k_dominates(pspace=pspace,i=i,j=j,k=index)) return(F)
-    }
-    return(T)
-  }
-  dominates_by_transitivity <- function(i,j,domination_graph) {
-     for(h in 1:nrow(domination_graph)) {
-       if(domination_graph[i,h] & domination_graph[h,j])  {
-         return(T)
-       }
-     }
-     return(F)
-  }
-  number_ocs <- length(pspace$p_space[[1]])
-  #Embed the domination graph in a rectangular matrix where there is an edge
-  #between oc i and oc j iff domination_graph[i,j] is True
-  domination_graph <- matrix(F,nrow=number_ocs,ncol=number_ocs)
-  for(i in 1:number_ocs) {
-    for(j in 1:number_ocs) {
-      if(domination_graph[i,j]) next
-      if(i==j) next #No cycles
-      if(dominates_by_transitivity(i,j,domination_graph) || dominates(i,j,pspace)) {
-        domination_graph[i,j] <- T
-        domination_graph[j,i] <- T
-      }
-    }
-  }
-  return(domination_graph)
+  #First we have to format the pspace structure in such a way that the cpp program can use it
+  list_oc_ids <- pspace$oc_ids
+  pspace_without_eps <- t(sapply(pspace$p_space,function(row) {sapply(row,function(pnode){as.integer(pnode[1])})}))
+  make_domination_graph(pspace = pspace_without_eps,list_oc_ids = as.integer(list_oc_ids))  
 }
 
-#currently only works in n*log(n). We should maybe save the eps values in dspace somehow, so that they are
-#acessible by outlier_id
+#currently only works in n*log(n). We should maybe save the eps values in dspace
+#somehow, so that they are acessible by outlier_id
 #'@export
 detect_outliers_dspace <- function(dspace,eps,k,ospace) {
   epsvalue <- function(oc_id) {
