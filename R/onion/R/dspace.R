@@ -19,14 +19,13 @@ construct_dspace <- function(pspace) {
     #now we want to sort domgroup in the same order as one_set_of_pnodes.
     #It does not seem like the standard R 'sort' and 'order' functions can do this
     #For now, we use a relatively inefficient sorting algorithm
-    sorted_until_here <- 1
     for(i in 1:length(one_set_of_pnodes)) {
-      position_in_domgroup <- which(one_set_of_pnodes==domgroup[i])
+      position_in_domgroup <- which(one_set_of_pnodes[i]==domgroup)
       if(length(position_in_domgroup)==0) next
       else {
         #swap the values. I know that we could do addswap, but this algorithm is not final anyway
-        temp <- domgroup[sorted_until_here]
-        domgroup[sorted_until_here] <- domgroup[position_in_domgroup]
+        temp <- domgroup[i]
+        domgroup[i] <- domgroup[position_in_domgroup]
         domgroup[position_in_domgroup] <- temp
       }
     }
@@ -72,7 +71,7 @@ detect_outliers_dspace <- function(dspace,eps,k,ospace) {
         else{
           next_to_check <- floor(interval[1] + interval_length/2)
           if(epsvalue(vec[next_to_check]) < x) {
-            return(binary_search_first_smaller_helper(x,vec,c(next_to_check,interval[2])))
+          return(binary_search_first_smaller_helper(x,vec,c(next_to_check,interval[2])))
           } else return(binary_search_first_smaller_helper(x,vec,c(interval[1],next_to_check)))
         }
       }
@@ -101,8 +100,8 @@ comparative_outlier_analytics_dspace <- function(dspace,input_set) {
     weakest_outlier <- weakest_outlier + 1
     outliers_by_domtree <- lapply(1:length(weakest_outlier),function(index){
       if(weakest_outlier[index]==1){return(NA)}
-      domtree <- dspace$domination_forest[index]
-      domtree[(weakest_outlier[index]):length(domtree)]
+      domtree <- dspace$domination_forest[[index]]
+      return(domtree[(weakest_outlier[index]):length(domtree)])
     })
     comparative_outliers <- unlist(outliers_by_domtree)
     comparative_outliers <- comparative_outliers[!is.na(comparative_outliers)]

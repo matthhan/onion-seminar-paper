@@ -37,18 +37,20 @@ comparative_outlier_analytics_ospace <- function(ospace,set_of_ocs) {
     #mineps of these epsvals is the eps for which all except one  of set_of_ocs 
     #are categorized as outliers. Then we subtract a very minuscule number from
     #mineps so that every one of them is now categorized as an outlier.
-    mineps <- min(epsvals) - 0.00001
+    maxeps <- min(epsvals) - 0.00001
     relative_outliers_for_k[,i] <- ospace$space_delimiter[,i] > mineps
   }
-  relative_outliers_forall_k <- apply(relative_outliers_for_k,1,function(row){Reduce(function(a,b){a&b},row)})
+  relative_outliers_forall_k <- Reduce(f = intersect,apply(relative_outliers_for_k,2,which))
   return(ospace$oc_ids[relative_outliers_forall_k])
   
 }
+#'@export
 outlier_centric_parameter_space_exploration_ospace <- function(ospace,input_set) {
   parameter_settings <- list()
   for(k in 1:ncol(ospace$space_delimiter)) {
     input_set_correct_indexes <- which(sapply(ospace$oc_ids,function(oc_id){any(oc_id==input_set)}))
-    epsilon <- max(ospace[input_set_correct_indexes,k])
+    epsilon <- max(ospace$space_delimiter[input_set_correct_indexes,k])
     parameter_settings[[k]] <- list(k=k,eps=epsilon)
   }
+  return(parameter_settings)
 }
