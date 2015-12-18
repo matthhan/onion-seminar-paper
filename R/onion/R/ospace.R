@@ -48,9 +48,10 @@ comparative_outlier_analytics_ospace <- function(ospace,set_of_ocs) {
 outlier_centric_parameter_space_exploration_ospace <- function(ospace,input_set) {
   parameter_settings <- list()
   for(k in 1:ncol(ospace$space_delimiter)) {
-    input_set_correct_indexes <- which(sapply(ospace$oc_ids,function(oc_id){any(oc_id==input_set)}))
+    input_set_correct_indexes <- which(sapply(ospace$oc_ids,function(oc_id){oc_id%in% input_set}))
     epsilon <- max(ospace$space_delimiter[input_set_correct_indexes,k])
     parameter_settings[[k]] <- list(k=k,eps=epsilon)
   }
-  return(parameter_settings)
+  #Last line is only so that the result is output as a matrix  
+  return(sapply(parameter_settings,as.list))
 }

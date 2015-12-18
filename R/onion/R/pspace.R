@@ -1,4 +1,3 @@
-
 #'@export
 construct_pspace <- function(ospace) {
   pnode <- function(oc_id,eps) {
@@ -63,4 +62,18 @@ comparative_outlier_analytics_pspace <- function(pspace,set_of_ocs) {
   })
   return(Reduce(intersect,comparative_outliers_by_k))
   
+}
+#'@export
+outlier_centric_parameter_space_exploration_pspace <- function(pspace,input_set,ospace,delta) {
+  real_indexes <- which(sapply(pspace$oc_ids,function(oc_id){oc_id %in% input_set}))
+  minimum_ocs <- sapply(1:ncol(ospace$space_delimiter),function(k) {
+    index_of_min <- ospace$oc_ids[real_indexes[which.max(ospace$space_delimiter[real_indexes,k])]]
+  })
+  minimum_ocs_as_indexes_into_pspace <- sapply(1:length(minimum_ocs),function(i){
+    which(sapply(pspace$p_space[[i]],"[",1) == minimum_ocs[i])
+  })  
+  delta_applied <- floor(minimum_ocs_as_indexes_into_pspace*delta)
+  epsvalues <- sapply(1:length(delta_applied),function(i){pspace$p_space[[i]][[delta_applied[[i]]]][2]})
+  result <- sapply(1:length(epsvalues),function(i){list(eps=epsvalues[i],k=(ospace$k[1]:ospace$k[2])[i])})
+  return(result)
 }

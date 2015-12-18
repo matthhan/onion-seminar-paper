@@ -21,3 +21,5 @@ ausarbeitung/*.bst
 ausarbeitung/*.doc
 *.tar.gz
 *.un~
+*.o
+*.so
