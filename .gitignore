@@ -23,3 +23,7 @@ ausarbeitung/*.doc
 *.un~
 *.o
 *.so
+*.pbf
+*.eps
+*.csv
+*.Rdata
