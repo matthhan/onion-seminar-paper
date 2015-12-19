@@ -1,0 +1,63 @@
+> system.time(ospace <- construct_ospace(data,k=c(3,6),eps=c(0.05,0.1)))
+   user  system elapsed 
+308.684   9.652 366.076 
+   user  system elapsed 
+313.460  10.928 372.250 
+> length(which(ospace$assignment=="outlier_candidate"))
+[1] 281
+
+----------------------------------------------------------------------
+> system.time(ospace <- construct_ospace(data,k=c(2,5),eps=c(0.03,0.1)))
+   user  system elapsed 
+374.376  11.060 441.607 
+   user  system elapsed 
+379.308  12.948 449.496 
+> length(which(ospace$assignment=="outlier_candidate"))
+[1] 470
+-----------------------------------------------------------------------
+> system.time(ospace <- construct_ospace(data,k=c(2,5),eps=c(0.01,0.1)))
+   user  system elapsed 
+374.356  10.924 439.275 
+   user  system elapsed 
+379.004  15.464 448.476 
+> length(which(ospace$assignment=="outlier_candidate"))
+[1] 2336
+> system.time(pspace <- construct_pspace(ospace))
+   user  system elapsed 
+  0.056   0.000   0.057 
+> system.time(dspace <- construct_dspace(pspace))
+   user  system elapsed 
+151.584   0.048 151.669
+------------------------------------------------------------------------
+> library("pryr")
+> object_size(ospace$space_delimiter)
+75 kB
+> object_size(ospace$assignment)
+338 MB
+> object_size(as.factor(ospace$assignment))
+169 MB
+> attributes(dspace)
+$names
+[1] "domination_forest" "oc_ids"            "eps"               "k"
+"assignment"       
+
+$class
+[1] "D-Space"
+
+> length(dspace)
+[1] 5
+----------------------------------------------------------------------
+> system.time(ospace <- construct_ospace(data,k=c(3,6),eps=c(0.05,0.1)))
+   user  system elapsed 
+144.996   2.688 147.727 
+   user  system elapsed 
+147.248   3.196 150.488 
+-----------------------------------------------------------------------
+> length(which(ospace$assignment=="outlier_candidate"))
+[1] 186
+> system.time(pspace <- construct_pspace(ospace))
+   user  system elapsed 
+  0.004   0.000   0.004 
+> system.time(dspace <- construct_dspace(pspace))
+   user  system elapsed 
+  0.084   0.000   0.083 
