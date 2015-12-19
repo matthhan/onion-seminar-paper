@@ -1,6 +1,6 @@
 #'@export
 construct_ospace <- function(data,k,eps) {
-  nearest_neighbors <- our_fast_nn(data,k,eps=eps)
+  system.time(nearest_neighbors <- our_fast_nn(data,k,eps=eps))
   #const_outlier_ids <- which(apply(nearest_neighbors$nn.idx,1,function(row){0 %in% row}))
   const_outlier_ids<- which(nearest_neighbors$nn.dists[,k[1]] >= eps[2])
   const_inlier_ids <- which(nearest_neighbors$nn.dists[,k[2]] <= eps[1])
