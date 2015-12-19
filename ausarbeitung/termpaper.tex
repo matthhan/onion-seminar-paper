@@ -180,7 +180,13 @@ Answering PSE using \emph{P-Space} additionally requires access to \emph{O-Space
 To answer PSE using \emph{D-Space}, one has to find the weakest outlier in the intersection of the input set P and each domination list, i.e. the weakest outlier in $P \cap \text{list}_1, \ldots ,P\cap\text{list}_j$ . This can be done using \emph{O-Space}. Then, the $\delta$ parameter can be incorporated by applying the simple multiplication one would use when answering this query-type using \emph{P-Space} to each domtree. The final parameters can be obtained using \emph{O-Space} as before. The time complexity of this algorithm is dominated by the cost of intersecting the input set and the outliers in the domination lists, which can in $\mathcal{O}(|OC| + |P|)$ using a hash set data structure. We did not find an algorithm that solves this problem with the $\mathcal{O}(|P| + n)$ (where n is the number of domination lists) complexity that is claimed in the original paper.
 \section{Evaluation}
 \section{Conclusion}
-%
+
+We have established a novel system for outlier detection that facilitates outlier detection and have shown that this system is not much slower than the established $n\cdot \log(N)$ algorithms for the first query and allows for drastically improved processing time on any subsequent outlier detection query by sacrificing memory to store data structures. The size of these data structures is not much larger than the original data set if and only if the parameters are chosen carefully so that $|[k_{min},k_{max}]| \cdot |OC|$ is small. Choosing such a set of parameters in an Exploratory Data Analysis setting may be possible by consulting a visualization of the data but can also sometimes require experimentation, i.e. running the offline phase multiple times. In these cases, many initial queries may fail due to restrictions on the available memory and the performance gains from the ONION system are negated for all but the last few queries in which the parameters are ``fine-tuned''. 
+
+The other outlier analysis operations proposed also suffer from this problem, since they cannot be performed efficiently without the data structures. Even if memory is available to handle cases where the number of Outlier Candidates is large, the \emph{D-Space} construction algorithm is in NP and therefore slow on small numbers of outlier candidates and completely impractical in all other cases.
+
+Otherwise, especially for smaller data sets, the new outlier analysis operations are very helpful and have been shown\cite{onion} to improve the results of outlier analysis in practical situations by providing the analysts with a more diverse set of tools to find outliers in their data.
+
 % ---- Bibliography ----
 %
 
