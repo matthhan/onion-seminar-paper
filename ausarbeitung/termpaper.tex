@@ -37,7 +37,7 @@ Finding outliers in data is a problem frequently encountered in data analysis. F
 %TODO: expand this paragraph
 \subsection{Outlier Definitions}
 
-There is no universally accepted precise definition of what constitutes an outlier in a data set. Instead, several different definitions are used as appropriate for the task at hand.
+There is no universally accepted precise definition of what constitutes an outlier in a data set\cite{kriegeldefinitions,outlier_definitions}. Instead, several different definitions are used as appropriate for the task at hand.
 
 Traditionally, outliers have been defined with respect to a statistical distribution. In this approach, every data point to which the distribution assigns a probability below some threshold chosen by the analyst is classified as an outlier. However, this is only applicable if those points that are not outliers are known to follow a specific distribution. This is not always the case and choosing a statistical distribution so that it reflects the data set is challenging and may require domain knowledge and--especially for multivariate data--knowledge about statistics.
 
@@ -50,7 +50,7 @@ A competing outlier definition is the distance-based outlier. A point is a dista
     $O_{(\varepsilon,k)}(DB) := \{p\in DB \;| \;p\;\text{ is a distance-based outlier w.r.t. }(\varepsilon,k) \}$
 \end{definition}
 
-This definition is impartial to the distribution of the data and it is especially useful for geospatial data, where the Euclidean distance has additional meaning apart from indicating (dis-)similarity. Drawbacks of this definition include inability to cope with arbitrarily high-dimensional data, since the distances of the most-distant and the least-distant points approach each other as the dimensionality of data set grows--a phenomenon referred to as the curse of dimensionality. %TODO cite that one paper about curse of dimensionality.
+This definition is impartial to the distribution of the data and it is especially useful for geospatial data, where the Euclidean distance has additional meaning apart from indicating (dis-)similarity. Drawbacks of this definition include inability to cope with arbitrarily high-dimensional data, since the distances of the most-distant and the least-distant points approach each other as the dimensionality of data set grows--a phenomenon referred to as the \emph{curse of dimensionality}\cite{curse_of_dimensionality}.
 \subsection{Computation Methods for Distance-Based Outliers}
 
 The naive way to detect distance-based outliers is to simply compute the distances between each pair of points. From the resulting distance matrix, the k-th closest other point for every point $p_i$ can be found by scanning $p_i$'s row in the distance matrix. Then, one has to check whether the distance to this k-th closest point is bigger than $\varepsilon$. If this is the case, then $p_i$ is an outlier.
@@ -61,11 +61,10 @@ Faster algorithms to solve this problem are typically based on spatial index str
 
 This algorithm clearly performs better for large datasets. However in our experiments we found that for e.g. a geospatial dataset\footnote{Further information about this dataset and the experiments carried out with it is to be found in the evaluation section} of roughly 600 Mb, a single outlier detection query already takes about 6 minutes on a typical consumer laptop computer. Since the time complexity of the algorithm is (slightly) above linear, datasets that are even 10 times this size will already cause considerable processing times even on faster machines.
 
-One solution to this problem is to use parallelism %TODO: cite zhang 2012 here
+One solution to this problem is to use parallelism \cite{parallel_knn}
 however parallelizing the $k$nn-queries is typically difficult to implement, requires expensive hardware (especially when parallelizing to many machines) and does not offer more than a linear speedup.
 
-Another possibility is to use the DOLPHIN system%TODO: cite dolphin paper here
-. However, this system was proposed in order to handle data sets that do not fit into the memory of the computer by minimizing disk access. For datasets that do fit into memory, this system does not even perform faster than the kd-tree algorithm.
+Another possibility is to use the DOLPHIN system\cite{dolphin}, which handles large data sets efficiently. However, this system was proposed in order to handle data sets that do not fit into the memory of the computer by minimizing disk access. For datasets that do fit into memory, this system does not even perform faster than the kd-tree algorithm.
 
 These performance issues are not as gave if only one isolated outlier detection query has to be performed. However, a typical use case for outlier detection is exploratory data analysis, where it is not clear ahead of time whether one set of parameters ($k$,$\varepsilon$) produces the desired outlier detection result. An analyst might, for example, run an outlier detection query with a value of $k$ that is very high, wait a long time for the result, and then find out that the outlier detection algorithm has classified every point as an outlier. They would then have to re-run the outlier detection algorithm with a different set of parameters, completely recomputing the $k$-nearest neighbors in the process. This process might have to be repeated multiple times until a satisfying result is found. In this scenario, the restrictive cost of outlier detections is a big problem.
 \subsection{Considerations for a New Outlier Detection System}
@@ -97,7 +96,7 @@ Similarly, the analyst might also know from a statistic maintained by their busi
 
 To conclude, a new outlier detection system should take ranges instead of fixed values for $\varepsilon$ and $k$ and use these to support efficient outlier detection queries within these ranges as well as the other outlier operations we presented.
 \section{Overview of the ONION System}
-The ONION system addresses the considerations of the previous section by having the user provide a parameter set $(k_{min},k_{max},\varepsilon_{min},\varepsilon_{max})$ instead of single values for $k$ and $\varepsilon$ and splitting the Outlier Analysis task into an offline and an online phase.
+The ONION\cite{onion} system  addresses the considerations of the previous section by having the user provide a parameter set $(k_{min},k_{max},\varepsilon_{min},\varepsilon_{max})$ instead of single values for $k$ and $\varepsilon$ and splitting the Outlier Analysis task into an offline and an online phase.
 
 In the offline phase, an initial knn query is performed and the result is processed into a series of three data structures: \emph{O-Space}, \emph{P-Space} and \emph{D-Space}, each of them allowing for more efficient answering of the three types of queries explained in the previous chapters.
 
@@ -132,11 +131,10 @@ The complexity of this \emph{O-Space} construction is dominated by the time need
 \subsection{P-Space}
 \emph{P-Space} can be computed from O-Space by sorting the distances in each column of the \emph{O-Space} table in ascending order, to allow for binary-search-like processing, reducing the runtime of some of the outlier analysis operations from linear to logarithmic time. Using any efficient sorting algorithm, this can be done in $k \cdot |OC| \cdot log(|OC|)$ time. 
 
-In order to still be able to identify which distance belongs to which outlier candidate after sorting, the index of the outlier candidate has to be carried along into each cell of the table. This tuple of $\text{index},\varepsilon)$ is referred to as a P-Node in the original paper describing the ONION system.
+In order to still be able to identify which distance belongs to which outlier candidate after sorting, the index of the outlier candidate has to be carried along into each cell of the table. This tuple of $\text{index},\varepsilon)$ is referred to as a P-Node in the original paper\cite{onion} describing the ONION system.
 
 We provide an example based on the example \emph{O-Space} computation from the previous section:
 %TODO: Add example
-%TODO: Add citation for the original onion system
 \subsection{D-Space}
 \emph{P-Space}, supports OD queries efficiently. However, CO can still not be computed easily based just on the \emph{P-Space} data structure. This is because outlier detection requires checking for each value of $k \in [k_{min},k_{max}]$ whether a particular point $p_i$ is an outlier if another point $p_j$ is an outlier. We introduce some terminology to tackle this problem:
 \begin{definition}[k-domination]
@@ -175,14 +173,13 @@ To find the set of comparative outliers $Q$ for one set of input points $Q$, usi
 Using \emph{O-Space} further reduces this complexity: Since it contains information about the domination relationship independent of the value of $k$, one only needs to search the domination lists for the weakest outlier in the input set $P$. All points preceding this point are then clearly comparative outliers. Since the domination lists are ordered, this search can be performed in logarithmic time, i.e. $\mathcal{O}(\log(n_1) + \ldots + \log(n_j))$, where $n_1, \ldots , n_j$ are the lengths of the domination lists as above.
 \subsection{Outlier-Centric Parameter Space Exploration}
  
-For $\delta=0$, Outlier-Centric Parameter Space Exploration using \emph{O-Space} can be supported by finding the weakest outlier, i.e. the one that needs the lowest value of $\varepsilon$ to become an inlier, for each $k \in [k_{min},k_{max}$. The time complexity of this is in $\mathcal{O}(|P| * |[k_{min}, k_{max}]|$, which is simply the summed-up cost of finding the weakest outlier for each $k$. In cases where $\delta \neq 0$, answering PSE requires sorting each individual row of \emph{O-Space}, which is exactly the same as computing \emph{P-Space}.
+For $\delta=0$, Outlier-Centric Parameter Space Exploration using \emph{O-Space} can be supported by finding the weakest outlier, i.e. the one that needs the lowest value of $\varepsilon$ to become an inlier, for each $k \in [k_{min},k_{max}]$. The time complexity of this is in $\mathcal{O}(|P| * |[k_{min}, k_{max}]|$, which is simply the summed-up cost of finding the weakest outlier for each $k$. In cases where $\delta \neq 0$, answering PSE requires sorting each individual row of \emph{O-Space}, which is exactly the same as computing \emph{P-Space}.
 
 Answering PSE using \emph{P-Space} additionally requires access to \emph{O-Space} because random access to $\varepsilon$ values is needed to find the weakest outlier as above and without random access, the complexity of just this subtask is in $\mathcal{O}(|[k_{min},k_{max}]| \cdot |OC|)$, which is much too large. Having used \emph{O-Space} to determine the weakest outliers for each $k$, one can then use their indices within their \emph{P-Space} rows to calculate which oc should be the new weakest outlier. Since all additional operations only have to be done once for each value of $k$, the time complexity of this is the same as the time complexity of answering PSE using \emph{O-Space}.
 
 To answer PSE using \emph{D-Space}, one has to find the weakest outlier in the intersection of the input set P and each domination list, i.e. the weakest outlier in $P \cap \text{list}_1, \ldots ,P\cap\text{list}_j$ . This can be done using \emph{O-Space}. Then, the $\delta$ parameter can be incorporated by applying the simple multiplication one would use when answering this query-type using \emph{P-Space} to each domtree. The final parameters can be obtained using \emph{O-Space} as before. The time complexity of this algorithm is dominated by the cost of intersecting the input set and the outliers in the domination lists, which can in $\mathcal{O}(|OC| + |P|)$ using a hash set data structure. We did not find an algorithm that solves this problem with the $\mathcal{O}(|P| + n)$ (where n is the number of domination lists) complexity that is claimed in the original paper.
-
-
-
+\section{Evaluation}
+\section{Conclusion}
 %
 % ---- Bibliography ----
 %
