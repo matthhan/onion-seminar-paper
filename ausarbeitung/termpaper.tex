@@ -33,8 +33,8 @@ Performing Distance-Based Outlier Analysis on Large Datasets poses a challenge w
 \end{abstract}
 \section{Motivation}
 Finding outliers in data is a problem frequently encountered in data analysis. For example credit card providers use outlier detection to find transactions that could be fraudulent. Similarly, in a network security context, outlier detection can be used to identify intruders. It has also been used for goals as diverse as data cleaning, financial planning and severe weather prediction.
+%TODO: add citation as proof for the usage
 
-%TODO: expand this paragraph
 \subsection{Outlier Definitions}
 
 There is no universally accepted precise definition of what constitutes an outlier in a data set\cite{kriegeldefinitions,outlier_definitions}. Instead, several different definitions are used as appropriate for the task at hand.
@@ -150,12 +150,14 @@ The domination graph is the undirected graph created by the domination relation.
 
 Since the domination relation is transitive and represented symmetrically in the graph, any set of outlier candidates among which the domination relation is total forms a subgraph, which is \emph{complete}, i.e. every pair of nodes is connected. To simplify CO, it would be useful to split the domination graph into a maximal set of complete subgraphs and order the points belonging to each subgraph w.r.t. the domination relationship. This could allow for logarithmic complexity comparative outlier analysis. However, the detection of maximal complete subgraphs (so called \emph{cliques}) is a known NP-complete problem. For this reason, this part of the preprocessing can only be performed in acceptable amounts of time if the number of outlier candidates is relatively small. If this is the case, then any algorithm to solve the cliques problem can be used.
 
-Once each \emph{clique} has been found, their nodes can in such a way that they are ordered by domination, thus making outliers binary-searchable w.r.t. domination. The list of these sorted \emph{domination lists} then forms \emph{D-Space}.
+Once each \emph{clique} has been found, their nodes can in such a way that they are ordered by domination, thus making outliers binary-searchable w.r.t. domination. The list of these sorted \emph{domination lists} then forms \emph{D-Space}. Our experiments in the later chapter show that these lists sometimes intersects and the number of \emph{domination lists} is usually very small, somewhere between 2 and 6 for all the datasets that we have tested.
 
-%TODO: cite cormen
-%TODO: explain relation to minimum vertex cover
-%TODO: Mention trees
-%TODO: mention typical number of trees
+We have deviated slightly from the original paper presenting the ONION system\cite{onion} in our description of \emph{D-Space}, by formulating the problem of finding the parts of the relation that are complete in terms of CLIQUES. In the original paper, they used the edge-inverted undirected graph of the domination relation and formulated the solution in terms another, less well-known NP complete problem called MINIMUM-VERTEX-COVER. In fact, inverting the edges of the domination graph (i.e. constructing for a given graph (E,V) a new graph ($E'$,V), so that $\forall v_1,v_2\in V(E(v_1,v_2) \equiv \not E'(v_1,v_2))$) is the canonical\cite{cormen} to reduce MINIMUM-VERTEX-COVER to CLIQUES and vice versa.
+
+We chose CLIQUES to formulate the problem because it is arguable more well-known  and ``fits'' our intuition better, but also because software to solve the CLIQUES problem was available to us.
+
+Additionally, the original paper structures the domination lists as trees. However, the paper does not seem to motivate why trees are a better choice than sorted arrays (which we reffered to as lists here).
+
 \section{Online Phase}
 \subsection{Outlier Detection}
 
@@ -180,7 +182,6 @@ Answering PSE using \emph{P-Space} additionally requires access to \emph{O-Space
 To answer PSE using \emph{D-Space}, one has to find the weakest outlier in the intersection of the input set P and each domination list, i.e. the weakest outlier in $P \cap \text{list}_1, \ldots ,P\cap\text{list}_j$ . This can be done using \emph{O-Space}. Then, the $\delta$ parameter can be incorporated by applying the simple multiplication one would use when answering this query-type using \emph{P-Space} to each domtree. The final parameters can be obtained using \emph{O-Space} as before. The time complexity of this algorithm is dominated by the cost of intersecting the input set and the outliers in the domination lists, which can in $\mathcal{O}(|OC| + |P|)$ using a hash set data structure. We did not find an algorithm that solves this problem with the $\mathcal{O}(|P| + n)$ (where n is the number of domination lists) complexity that is claimed in the original paper.
 \section{Evaluation}
 \section{Conclusion}
-
 We have established a novel system for outlier detection that facilitates outlier detection and have shown that this system is not much slower than the established $n\cdot \log(N)$ algorithms for the first query and allows for drastically improved processing time on any subsequent outlier detection query by sacrificing memory to store data structures. The size of these data structures is not much larger than the original data set if and only if the parameters are chosen carefully so that $|[k_{min},k_{max}]| \cdot |OC|$ is small. Choosing such a set of parameters in an Exploratory Data Analysis setting may be possible by consulting a visualization of the data but can also sometimes require experimentation, i.e. running the offline phase multiple times. In these cases, many initial queries may fail due to restrictions on the available memory and the performance gains from the ONION system are negated for all but the last few queries in which the parameters are ``fine-tuned''. 
 
 The other outlier analysis operations proposed also suffer from this problem, since they cannot be performed efficiently without the data structures. Even if memory is available to handle cases where the number of Outlier Candidates is large, the \emph{D-Space} construction algorithm is in NP and therefore slow on small numbers of outlier candidates and completely impractical in all other cases.
