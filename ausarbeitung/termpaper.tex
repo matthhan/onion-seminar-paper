@@ -127,17 +127,85 @@ Similarly, once the $k$nn search has finished, all $p_i$ whose distance to their
 
 The remaining points are labeled \emph{outlier candidates} and only for these do the $k$nn-query results play any further role.  However, the distances to the $[1,k_{min}-1]$-th nearest neighbors for each outlier candidate can still be discarded. We denote the set of outlier candidates by $OC$.
 
+\newpage
 An example is given to illustrate this:
-%TODO: Add example here
+
+Consider the following two-dimensional dataset:
+
+\begin{figure}
+\begin{minipage}[H]{.65\textwidth}
+\centering
+\includegraphics[width=.7\linewidth]{images/example_plot.eps}
+\end{minipage}
+\begin{minipage}[H]{.3\textwidth}
+\centering
+\begin{tabular}{ | c | c  c |}
+\hline
+i & X1 & X2 \\
+\hline
+0 & 0 & 0 \\
+1 & 1 & 0 \\
+2 & 0 & 1 \\
+3 & 5 & 0 \\
+4 & 1 & 4 \\
+5 & 2 & 1 \\
+6 & 5 & 5 \\
+\hline
+\end{tabular}
+\end{minipage}
+\caption{Example Data Set}
+\end{figure}
+
+Its \emph{O-Space} data structure with the parameter set $([k_{min},k_{max}],[\varepsilon_{min},\varepsilon_{max}])=([2,5],[2,3.5])$ would look as follows:
+
+\begin{table}
+\caption{Example \emph{O-Space}}
+\centering
+\begin{tabular} {| c | c | c | c |}
+\hline
+i\textbackslash$k$ & 2 & 3 & 4\\
+\hline
+0 & 1 & 1 & 2.23 \\
+\hline
+1 &\multicolumn{3}{|c|}{const inlier}\\
+2 &\multicolumn{3}{|c|}{const inlier}\\
+\hline
+3 & 3.16 & 4 & 5 \\
+4 & 3.16 & 3.16 & 4 \\
+5 & 1.41 & 2 & 2.23\\
+\hline
+6 &\multicolumn{3}{|c|}{const outlier}\\
+\hline
+\end{tabular}
+\end{table}
+
+To simplify this data structure, the assignment of the points to the classes ``const outlier'', ``const inlier'' and ``outlier candidate'' can be saved in a separate vector. Then the table consists only of numbers, which is much easier to handle in most programming languages. It is however necessary to make sure that it is still possible to determine which row belongs to which data point. 
+
 The complexity of this \emph{O-Space} construction is dominated by the time needed to compute the knn and therefore depends on the algorithm used for knn search (ideally one that can be performed in $n \cdot log(n)$ time), since all other operations needed to construct \emph{O-Space} can be carried out in linear time.
-%TODO: Add example
 \subsection{P-Space}
 \emph{P-Space} can be computed from O-Space by sorting the distances in each column of the \emph{O-Space} table in ascending order, to allow for binary-search-like processing, reducing the runtime of some of the outlier analysis operations from linear to logarithmic time. Using any efficient sorting algorithm, this can be done in $k \cdot |OC| \cdot log(|OC|)$ time. 
 
-In order to still be able to identify which distance belongs to which outlier candidate after sorting, the index of the outlier candidate has to be carried along into each cell of the table. This tuple of $\text{index},\varepsilon)$ is referred to as a P-Node in the original paper\cite{onion} describing the ONION system.
+In order to still be able to identify which distance belongs to which outlier candidate after sorting, the index of the outlier candidate has to be carried along into each cell of the table. This tuple of $(\text{index},\varepsilon)$ is referred to as a P-Node in the original paper \cite{onion} describing the ONION system.
 
-We provide an example based on the example \emph{O-Space} computation from the previous section:
-%TODO: Add example
+As an example based on the \emph{O-Space} computation from the previous section, we give the \emph{P-Space} of the same dataset:
+\begin{table}
+\centering
+\caption{Example \emph{P-Space}}
+\begin{tabular} {| l | l | l |}
+\hline
+\multicolumn{3}{|c|}{k}\\
+\hline
+2 & 3 & 4\\
+\hline
+(0,1) & (0,1) & (0,2.23) \\
+(5,1.41) & (5,2) & (5,2.23)\\
+(3,3.16) & (4,3.16)  & (4,4)  \\
+(4,3.16) & (3,4)  & (3,5)\\
+\hline
+\end{tabular}
+\end{table}
+
+Note that while the sorting enables the application of binary-search style algorithms, it also makes constant-time queries for the distance of the $k$-th neighbor of one particular daat point impossible. The \emph{O-Space} structure is still required for some online operations because of this limitation.
 \subsection{D-Space}
 \emph{P-Space}, supports OD queries efficiently. However, CO can still not be computed easily based just on the \emph{P-Space} data structure. This is because outlier detection requires checking for each value of $k \in [k_{min},k_{max}]$ whether a particular point $p_i$ is an outlier if another point $p_j$ is an outlier. We introduce some terminology to tackle this problem:
 \begin{definition}[k-domination]
@@ -220,7 +288,7 @@ This graph also shows that the construction times of the other data structures d
 \caption{Running Time of \emph{D-Space} Construction w.r.t. Number of Outlier Candidates (Logarithmic Scale)}
 \end{figure}
 
-\emph{P-Space} construction was, however, so fast that we could not measure runtime very accurately using R's \texttt{system.time} function. However, we point out that even with these inaccurate measurements it is fairly clear that the cost of \emph{P-Space} construction is fairly low and practically linar.
+In our experiments, \emph{P-Space} construction was so fast that we could not measure runtime very accurately using R's \texttt{system.time} function. However, we point out that even with these inaccurate measurements it is fairly clear that the cost of \emph{P-Space} construction is fairly low and practically linar.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/pspace_vs_ocs.eps}

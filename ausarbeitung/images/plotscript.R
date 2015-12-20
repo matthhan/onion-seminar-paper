@@ -36,6 +36,9 @@ data <- read.csv("../../results/vary_k_max.csv",header=T,sep=",")
 ggplot(data,aes(x=k_max)) + 
   geom_line(aes(y=duration_knn_query)) + geom_point(aes(y=duration_knn_query)) + 
   labs(y="Time (Seconds)",x="Value for kmax") + expand_limits(y=0)
+ggplot(data,aes(x=outlier_candidates)) + 
+  geom_line(aes(y=pspace_construction)) + geom_point(aes(y=pspace_construction)) + 
+  labs(y="Time (Seconds)",x="Number of Outlier Candidates")
 
 
 

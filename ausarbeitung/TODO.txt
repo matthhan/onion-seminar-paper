@@ -1,6 +1,6 @@
 Finish writing first draft
-add examples
-----------------------------------------
 Maybe add example for why domination not complete
 -------------------------------------------
 Maybe Also include LOF
+------------------------------------------
+Also perform O-Space OD on dataset sizes
