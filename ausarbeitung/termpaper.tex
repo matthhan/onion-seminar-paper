@@ -34,12 +34,11 @@ Germany\\
 Performing Distance-Based Outlier Analysis on Large Datasets poses a challenge with respect to computation time. Due to its $n\log(n)$ complexity, the kd-tree based algorithm for $k$-nearest neighbor search is not applicable for interactive outlier exploration over data sets whose exceed several hundred mega- or even several gigabytes. In this paper, we present a system that preprocesses the results of an initial application of the standard algorithm and stores them in memory to efficiently support any following outlier detection queries and also two novel outlier analysis operations that allow data analysts to gain insight into the outlier status of relevant parts of the data set much more quickly than the traditional approach of repeatedly finding $k$-nearest neighbors would.
 \end{abstract}
 \section{Motivation}
-Finding outliers in data is a problem frequently encountered in data analysis. For example credit card providers use outlier detection to find transactions that could be fraudulent. Similarly, in a network security context, outlier detection can be used to identify intruders. It has also been used for goals as diverse as data cleaning, financial planning and severe weather prediction.
-%TODO: add citation as proof for the usage
+Finding outliers in data is a problem frequently encountered in data analysis. For example credit card providers use outlier detection to find transactions that could be fraudulent \cite{creditfraud}. Similarly, in a network security context, outlier detection can be used to identify intruders \cite{intrusion}. It has also been used for goals as diverse as data cleaning \cite{datacleaning}, financial planning and severe weather prediction \cite{weather}.
 
 \subsection{Outlier Definitions}
 
-There is no universally accepted precise definition of what constitutes an outlier in a data set\cite{kriegeldefinitions,outlier_definitions}. Instead, several different definitions are used as appropriate for the task at hand.
+There is no universally accepted precise definition of what constitutes an outlier in a data set \cite{kriegeldefinitions,outlier_definitions}. Instead, several different definitions are used as appropriate for the task at hand.
 
 Traditionally, outliers have been defined with respect to a statistical distribution. In this approach, every data point to which the distribution assigns a probability below some threshold chosen by the analyst is classified as an outlier. However, this is only applicable if those points that are not outliers are known to follow a specific distribution. This is not always the case and choosing a statistical distribution so that it reflects the data set is challenging and may require domain knowledge and--especially for multivariate data--knowledge about statistics.
 
@@ -191,8 +190,8 @@ We evaluate our implementation of the ONION system on a real world geospatial da
 \subsection{Data Set}
 For evaluation we used position data from OpenStreetMap\footnote{available at http://download.geofabrik.de} on the South American continent and some South Pacific islands. This data was obtained by parsing the xml data of the OpenStreetMap project and saving the longitudes and latitudes of all ``nodes'', i.e. all points on the map that represent houses, traffic signs, parking spaces etc. This preprocessing resulted in a data set of roughly 80 million coordinates. The data set was subsequently normalized to facilitate parameter selection. Appropriately sized subsets of this datasets were extracted by random sampling.
 \begin{figure}[H]
-\caption{A Normalized, Randomly Sampled Subset of the Data Set}
 \includegraphics[width=.68\textwidth]{images/south-america-osm.eps}
+\caption{A Normalized, Randomly Sampled Subset of the Data Set}
 \end{figure}
 \subsection{Environment}
 Experiments were carried out on a desktop computer running Mac OS X with a 2.5GHz quad-core processor and 12 GB of RAM. Some of the earlier results in the paper were obtained with a laptop running Ubuntu that had a similar processing power. 
@@ -201,23 +200,37 @@ The implementation was done in R, except for the initial $k$nn query and most of
 \subsection{Results}
 To obtain information about the running time of the ONION system, we ran the offline phase on several subsets of the OpenStreetMap data set with a parameter setting of $([k_{min},k_{max}],[\varepsilon_{min},\varepsilon_{max}] = ([3,6],[0.05,0.1])$
 \begin{figure}[h]
-\caption{Running Time of $K$nn-query and Subsequent \emph{O-Space} Construction}
 \includegraphics[width=\textwidth]{images/ospace_vs_knn.eps}
+\caption{Running Time of $K$nn-query and Subsequent \emph{O-Space} Construction}
 \end{figure}
 
 As can be seen here, the $k$nn query has a practically linear running time with respect to the dataset size and the overhead of constructing the \emph{O-Space} data structure is very small in comparison. This raises the question if \emph{O-Space} construction is constant.
 
 
 \begin{figure}[H]
-\caption{Running Time of Data Structure Constructions}
 \includegraphics[width=\textwidth]{images/spaces_construction.eps}
+\caption{Running Time of Data Structure Constructions}
 \end{figure}
 
-As this figure shows, this is not the case: \emph{O-Space} construction is linear. This is not surprising, since the main operations performed in its construction apart from the $k$nn query are the identification of const outliers and const inliers. Both are performed in one scan over the dataset.
-This graph also shows that the construction times of the other data structures do not depend on the number of points in the original dataset. Instead, the number of outlier candidates, which is not monotonous w.r.t. dataset size has to be used as reference. To this end, we performed additional queries with a relatively small(3000000 points) subset of the data and various parameter settings to confirm our suspicions about the running times of \emph{D-Space} and \emph{P-Space}.
+As this figure shows, this is not the case: \emph{O-Space} construction is linear in the number of data points. This is not surprising, since the main operations performed in its construction apart from the $k$nn query are the identification of const outliers and const inliers. Both are performed in one scan over the dataset.
+This graph also shows that the construction times of the other data structures do not depend on the number of points in the original dataset. Instead, the number of outlier candidates, which is not monotonous w.r.t. dataset size has to be used as reference. To this end, we performed additional queries with a relatively small(3000000 points) subset of the data and various parameter settings to confirm our suspicions about the running times of \emph{D-Space} construction:
 
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{images/num_ocs_vs_dspace.eps}
+\caption{Running Time of \emph{D-Space} Construction w.r.t. Number of Outlier Candidates (Logarithmic Scale)}
+\end{figure}
 
+\emph{P-Space} construction was, however, so fast that we could not measure runtime very accurately using R's \texttt{system.time} function. However, we point out that even with these inaccurate measurements it is fairly clear that the cost of \emph{P-Space} construction is fairly low and practically linar.
 
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{images/pspace_vs_ocs.eps}
+\caption{Running Time of \emph{D-Space} Construction w.r.t. Number of Outlier Candidates (Logarithmic Scale)}
+\end{figure}
+
+In conclusion, we have shown that for large datasets, \emph{O-Space} construction is not meaningfully more expensive than a single Outlier Detection Request with the typical kd-tree algorithm. Additionally, \emph{P-Space} construction is very inexpensive, even for bigger numbers of outliers, while \emph{D-Space} construction quickly becomes too costly. 
+
+Our implementation did not allow for a fair comparison of the Online Outlier Detection operations because of specific performance characteristics of the R language: Essentially, vectorized operations are very fast in R, while the overhead incurred by each function call is large. Therefore many of our linear-time algorithms are fairly fast (because they utilize vectorization), while our logarithmic-time algorithms perform much slower due to their reliance on recursion and control-flow-statements (which are implemented as functions in R). We should, however, add that the data structures did speed up the processing time of the requests.
+%TODO: Add results for ospace OD query
 \section{Conclusion}
 We have established a novel system for outlier detection that facilitates outlier detection and have shown that this system is not much slower than the established $n\cdot \log(N)$ algorithms for the first query and allows for drastically improved processing time on any subsequent outlier detection query by sacrificing memory to store data structures. The size of these data structures is not much larger than the original data set if and only if the parameters are chosen carefully so that $|[k_{min},k_{max}]| \cdot |OC|$ is small. Choosing such a set of parameters in an Exploratory Data Analysis setting may be possible by consulting a visualization of the data but can also sometimes require experimentation, i.e. running the offline phase multiple times. In these cases, many initial queries may fail due to restrictions on the available memory and the performance gains from the ONION system are negated for all but the last few queries in which the parameters are ``fine-tuned''. 
 

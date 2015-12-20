@@ -1,11 +1,6 @@
 Finish writing first draft
-add evaluation chapter
---------------------------------------
 add examples
 ----------------------------------------
 Maybe add example for why domination not complete
-------------------------------------------
 -------------------------------------------
 Maybe Also include LOF
-----------------------------------------
-Citations in introduction
