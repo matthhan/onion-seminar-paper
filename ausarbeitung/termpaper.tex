@@ -3,6 +3,8 @@
 %
 \usepackage{makeidx}  % allows for indexgeneration
 \usepackage{amsmath} % allows for \text{}
+\usepackage{graphicx}
+\usepackage{float}
 %
 \begin{document}
 %
@@ -188,12 +190,33 @@ We evaluate our implementation of the ONION system on a real world geospatial da
 
 \subsection{Data Set}
 For evaluation we used position data from OpenStreetMap\footnote{available at http://download.geofabrik.de} on the South American continent and some South Pacific islands. This data was obtained by parsing the xml data of the OpenStreetMap project and saving the longitudes and latitudes of all ``nodes'', i.e. all points on the map that represent houses, traffic signs, parking spaces etc. This preprocessing resulted in a data set of roughly 80 million coordinates. The data set was subsequently normalized to facilitate parameter selection. Appropriately sized subsets of this datasets were extracted by random sampling.
-
+\begin{figure}[H]
+\caption{A Normalized, Randomly Sampled Subset of the Data Set}
+\includegraphics[width=.68\textwidth]{images/south-america-osm.eps}
+\end{figure}
 \subsection{Environment}
 Experiments were carried out on a desktop computer running Mac OS X with a 2.5GHz quad-core processor and 12 GB of RAM. Some of the earlier results in the paper were obtained with a laptop running Ubuntu that had a similar processing power. 
 
 The implementation was done in R, except for the initial $k$nn query and most of the dspace construction, which could mostly be accomplished by using existing R and C++ libraries along with some C++ code that we wrote.
 \subsection{Results}
+To obtain information about the running time of the ONION system, we ran the offline phase on several subsets of the OpenStreetMap data set with a parameter setting of $([k_{min},k_{max}],[\varepsilon_{min},\varepsilon_{max}] = ([3,6],[0.05,0.1])$
+\begin{figure}[h]
+\caption{Running Time of $K$nn-query and Subsequent \emph{O-Space} Construction}
+\includegraphics[width=\textwidth]{images/ospace_vs_knn.eps}
+\end{figure}
+
+As can be seen here, the $k$nn query has a practically linear running time with respect to the dataset size and the overhead of constructing the \emph{O-Space} data structure is very small in comparison. This raises the question if \emph{O-Space} construction is constant.
+
+
+\begin{figure}[H]
+\caption{Running Time of Data Structure Constructions}
+\includegraphics[width=\textwidth]{images/spaces_construction.eps}
+\end{figure}
+
+As this figure shows, this is not the case: \emph{O-Space} construction is linear. This is not surprising, since the main operations performed in its construction apart from the $k$nn query are the identification of const outliers and const inliers. Both are performed in one scan over the dataset.
+This graph also shows that the construction times of the other data structures do not depend on the number of points in the original dataset. Instead, the number of outlier candidates, which is not monotonous w.r.t. dataset size has to be used as reference. To this end, we performed additional queries with a relatively small(3000000 points) subset of the data and various parameter settings to confirm our suspicions about the running times of \emph{D-Space} and \emph{P-Space}.
+
+
 
 \section{Conclusion}
 We have established a novel system for outlier detection that facilitates outlier detection and have shown that this system is not much slower than the established $n\cdot \log(N)$ algorithms for the first query and allows for drastically improved processing time on any subsequent outlier detection query by sacrificing memory to store data structures. The size of these data structures is not much larger than the original data set if and only if the parameters are chosen carefully so that $|[k_{min},k_{max}]| \cdot |OC|$ is small. Choosing such a set of parameters in an Exploratory Data Analysis setting may be possible by consulting a visualization of the data but can also sometimes require experimentation, i.e. running the offline phase multiple times. In these cases, many initial queries may fail due to restrictions on the available memory and the performance gains from the ONION system are negated for all but the last few queries in which the parameters are ``fine-tuned''. 
