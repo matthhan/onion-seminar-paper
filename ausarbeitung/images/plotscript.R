@@ -39,6 +39,15 @@ ggplot(data,aes(x=k_max)) +
 ggplot(data,aes(x=outlier_candidates)) + 
   geom_line(aes(y=pspace_construction)) + geom_point(aes(y=pspace_construction)) + 
   labs(y="Time (Seconds)",x="Number of Outlier Candidates")
+data <- read.csv("../../results/ospace_od.csv",header=T,sep=",")
+ggplot(data,aes(x=dataset_size)) + 
+  geom_line(aes(y=ospace_od_time_mics)) + geom_point(aes(y=ospace_od_time_mics)) + 
+  labs(y="Time (Microseconds)",x="Dataset Size") +
+  expand_limits(y=0)
+ggplot(data,aes(x=outlier_candidates)) + 
+  geom_line(aes(y=ospace_od_time_mics)) + geom_point(aes(y=ospace_od_time_mics)) + 
+  labs(y="Time (Microseconds)",x="Number of Outlier Candidates") 
+
 
 
 
