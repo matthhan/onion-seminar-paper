@@ -1,7 +1,7 @@
 setwd("~/Desktop/Seminar/R")
 source("preprocess_rossmann.R")
 source("preprocess_osmdata.R")
-system.time(ospace <- construct_ospace(data,k=c(3,6),eps=c(0.05,0.1)))
+system.time(ospace <- construct_ospace(data,k=c(2,4),eps=c(0.01,0.1)))
 system.time(pspace <- construct_pspace(ospace))
 system.time(dspace <- construct_dspace(pspace))
 

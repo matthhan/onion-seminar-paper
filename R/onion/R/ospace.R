@@ -20,10 +20,13 @@ construct_ospace <- function(data,k,eps) {
 #'@export
 detect_outliers_ospace <- function(ospace,k,eps) {
   res <- ospace$assignment
+  #Only the performance of this line is measured in the term paper. The other
+  #lines perform operations that are linear in the number of data points, but
+  #not strictly speaking needed for outlier detection
   oc_assignment <- ospace$space_delimiter[,k-(ospace$k[1] - 1)] < eps
   oc_assignment <- sapply(oc_assignment,function(bool){if(bool){return("inlier")}else{return("outlier")}})
   res[ospace$oc_ids] <- oc_assignment
-  return(res)
+  return(oc_assignment)
 }
 #'@export
 comparative_outlier_analytics_ospace <- function(ospace,set_of_ocs) {

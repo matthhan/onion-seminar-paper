@@ -1,7 +1,7 @@
 Package: Onion
 Type: Package
 Title: Online Outlier Exploration over Large Datasets
-Version: 0.1
+Version: 0.2
 Date: 2015-11-15
 Authors@R: c(person("Matthias", "Hansen", role="cre",email="matthias.hansen@rwth-aachen.de"), person("Lei", "Cao", role="ctb"))
 Description: Efficiently performs online distance-based outlier detection and two other 
