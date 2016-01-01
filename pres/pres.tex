@@ -11,6 +11,10 @@
 \institute{RWTH Aachen University}
 \begin{document}
 \frame{\titlepage}
+
+\begin{frame}{Motivation}
+    \centering{Why do Outlier Detection?}
+\end{frame}
 \section{Outlier Detection}
 
 
@@ -28,8 +32,8 @@
 \begin{frame}{The Traditional Approach: Statistical Distributions}
     \begin{itemize}
         \item Statistical Distribution of Data must be known.
-        \item Can sometimes be Inferred (e.g. using Expectation Maximization).
         \item Linear Runtime.
+        \item Distribution can sometimes be Inferred (e.g. using Expectation Maximization).
     \end{itemize}
 \end{frame}
 
@@ -51,9 +55,9 @@
     \includegraphics[width=.7\textwidth]{images/south_america.png} 
     \end{center}
     \begin{itemize}
-        \item Task: Find Wrong Data Inserted by Malicious Users.
+        \item Task: Find wrong data inserted by malicious users.
 
-        \item Example: Someone placed a Shop in the middle of the ocean.
+        \item Example: Someone placed a shop in the middle of the ocean.
 
     \end{itemize}
 \end{frame}
@@ -73,17 +77,40 @@
     %TODO add explanatory graphic here
 \end{frame}
 
-
+\section{Outlier Detection and Performance}
 \begin{frame}{Performance Considerations}
     \begin{itemize}
-        \item Similarly to DBSCAN, naive computation in $\mathcal{O}(n^2)$ 
-        \item But: $\mathcal{O}(n\log(n))$ computation possible using spatial index structure ($k$-dimensional trees)
-        \item Cao reports a Runtime in the Order of Magnitude of 2 hours using (apparently) an $n\log(n)$ algorithm implemented in Java.
-        \item My Experiments: one Run of the $\mathcal{O}(n\log(n)$ Algorithm Takes Roughly 10 Minutes Using Mount and Arya's Optimized NN Library (written in C++).
-            %TODO: add citations here.
-        \item Due to (slightly) Above Linear Runtime, Datasets that are in the order of Magnitude of 10 or even 100GB are going to take quite long, even on fast machines and with optimized implementations.
-            
+        \item Naive way: Calculate pairwise distances. Then check criterion for each point.
+        \item Better way: use a spatial Index structure to compute $k$-nearest neighbors. Check whether distance to $k$-th neighbor is $\leq$ $\varepsilon$.
+        \item Runtime in $\mathcal{O}(n\log(n))$
     \end{itemize}
 \end{frame}
 
+\begin{frame}
+    Select some parameters: \visible<2>{\alert{Maybe $k = 5$ and $\varepsilon = 0.0001$?}}
+    \begin{center}
+        \visible{\includegraphics[width=\textwidth]{images/south_america.png}}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    Select some parameters: \alert{Maybe $k = 5$ and $\varepsilon = 0.0001$}?
+    \begin{center}
+        \visible{\includegraphics[width=\textwidth]{images/south_america_outliers.png}}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Parameter Selection is a Problem}
+    \begin{itemize}
+        \item Good parameter setting not obvious. 
+        \item Settings can not be tested on Subsets: \alert{Results will differ!}
+        \item Solution?\pause
+        \item Use Intermediate Results to support additional faster queries!
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{A Small Example}
+
+\end{frame}
 \end{document}
