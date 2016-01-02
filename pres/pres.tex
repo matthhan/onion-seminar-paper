@@ -1,6 +1,8 @@
 \documentclass{beamer}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{diagbox}
+\usepackage{colortbl}
 
 
 
@@ -104,13 +106,67 @@
     \begin{itemize}
         \item Good parameter setting not obvious. 
         \item Settings can not be tested on Subsets: \alert{Results will differ!}
-        \item Solution?\pause
-        \item Use Intermediate Results to support additional faster queries!
+        \item Solution?
     \end{itemize}
 \end{frame}
 
 
 \begin{frame}{A Small Example}
-
+    Consider the following dataset:
+    \begin{columns}
+        \begin{column}{.7\textwidth}
+            \includegraphics[width=.7\linewidth]{images/example_plot.eps}
+        \end{column}
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{ | c | c  c |}
+            \hline
+            i & X1 & X2 \\
+            \hline
+            0 & 0 & 0 \\
+            1 & 1 & 0 \\
+            2 & 0 & 1 \\
+            3 & 5 & 0 \\
+            4 & 1 & 4 \\
+            5 & 2 & 1 \\
+            6 & 5 & 5 \\
+            \hline
+            \end{tabular}
+        \end{column}
+    \end{columns}
+    Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
+\end{frame}
+\begin{frame}
+    Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
+    $K$-Nearest-Neighbors query yields:
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \backslashbox{i}{k} & 1 & 2 & 3 & 4 & 5 \\
+        \hline
+        0 &  0 &  1.000000 &  1.000000 &  2.236068 &  4.123106\\
+        1 &  0 &  1.000000 &  1.414214 &  1.414214 &  4.000000\\
+        2 &  0 &  1.000000 &  1.414214 &  2.000000 &  3.162278\\
+        3 &  0 &  3.162278 &  4.000000 &  5.000000 &  5.000000\\
+        4 &  0 &  3.162278 &  3.162278 &  4.000000 &  4.123106\\
+        5 &  0 &  1.414214 &  2.000000 &  2.236068 &  3.162278\\
+        6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
+        \hline
+     \end{tabular}
+\end{frame}
+\begin{frame}
+    Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
+    $K$-Nearest-Neighbors query yields:
+    \begin{tabular}{|c|c|c|c|c|>{\columncolor[rgb]{1,0.5,0.5}}c|}
+        \hline
+        \backslashbox{i}{k} & 1 & 2 & 3 & 4 & 5 \\
+        \hline
+        0 &  0 &  1.000000 &  1.000000 &  2.236068 &  4.123106\\
+        1 &  0 &  1.000000 &  1.414214 &  1.414214 &  4.000000\\
+        2 &  0 &  1.000000 &  1.414214 &  2.000000 &  3.162278\\
+        3 &  0 &  3.162278 &  4.000000 &  5.000000 &  5.000000\\
+        4 &  0 &  3.162278 &  3.162278 &  4.000000 &  4.123106\\
+        5 &  0 &  1.414214 &  2.000000 &  2.236068 &  3.162278\\
+        6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
+        \hline
+     \end{tabular}
 \end{frame}
 \end{document}
