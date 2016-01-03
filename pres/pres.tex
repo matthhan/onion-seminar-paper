@@ -18,9 +18,6 @@
     \centering{Why do Outlier Detection?}
 \end{frame}
 \section{Outlier Detection}
-
-
-
 \begin{frame}{Example: Gaussian Distribution $\mathcal{N}(0,1)$}
     \centering
     \includegraphics<1>[width=.7\textwidth]{images/gaussian.png}
@@ -30,7 +27,6 @@
 
     Outside \alert{red} lines $\implies$ outlier.}
 \end{frame}
-
 \begin{frame}{The Traditional Approach: Statistical Distributions}
     \begin{itemize}
         \item Statistical Distribution of Data must be known.
@@ -38,7 +34,6 @@
         \item Distribution can sometimes be Inferred (e.g. using Expectation Maximization).
     \end{itemize}
 \end{frame}
-
 \begin{frame}{Counterexample: Geospatial Data}
     \begin{itemize}
         \item OpenStreetMap Data for South America and South Pacific Islands
@@ -51,7 +46,6 @@
     \includegraphics[width=.7\textwidth]{images/south_america.png} 
     \end{center}
 \end{frame}
-
 \begin{frame}
     \begin{center}
     \includegraphics[width=.7\textwidth]{images/south_america.png} 
@@ -63,7 +57,6 @@
 
     \end{itemize}
 \end{frame}
-
 \begin{frame}{Distance-Based Outliers}
     \begin{block}{Distance-Based Outliers}
         Let DB be a sequence of vectors, dist a distance function.
@@ -78,7 +71,6 @@
     \end{itemize}
     %TODO add explanatory graphic here
 \end{frame}
-
 \section{Outlier Detection and Performance}
 \begin{frame}{Performance Considerations}
     \begin{itemize}
@@ -87,21 +79,18 @@
         \item Runtime in $\mathcal{O}(n\log(n))$
     \end{itemize}
 \end{frame}
-
-\begin{frame}
+\begin{frame}{A First Attempt\ldots}
     Select some parameters: \visible<2>{\alert{Maybe $k = 5$ and $\varepsilon = 0.0001$?}}
     \begin{center}
         \visible{\includegraphics[width=\textwidth]{images/south_america.png}}
     \end{center}
-\end{frame}
-
-\begin{frame}
+\end{frame}{A First Attempt\ldots}
+\begin{frame}{A First Attempt\ldots}
     Select some parameters: \alert{Maybe $k = 5$ and $\varepsilon = 0.0001$}?
     \begin{center}
         \visible{\includegraphics[width=\textwidth]{images/south_america_outliers.png}}
     \end{center}
 \end{frame}
-
 \begin{frame}{Parameter Selection is a Problem}
     \begin{itemize}
         \item Good parameter setting not obvious. 
@@ -109,8 +98,6 @@
         \item Solution?
     \end{itemize}
 \end{frame}
-
-
 \begin{frame}{A Small Example}
     Consider the following dataset:
     \begin{columns}
@@ -135,7 +122,7 @@
     \end{columns}
     Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
 \end{frame}
-\begin{frame}
+\begin{frame}{A Small Example (cont'd)}
     Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
     $K$-Nearest-Neighbors query yields:
     \begin{tabular}{|c|c|c|c|c|c|}
@@ -152,7 +139,7 @@
         \hline
      \end{tabular}
 \end{frame}
-\begin{frame}
+\begin{frame}{A Small Example (cont'd)}
     Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
     $K$-Nearest-Neighbors query yields:
     \begin{tabular}{|c|c|c|c|c|>{\columncolor[rgb]{1,0.5,0.5}}c|}
@@ -168,5 +155,61 @@
         6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
         \hline
      \end{tabular}
+     \pause
+
+     We can now re-use this table, right?\pause
+     Table size too big!
 \end{frame}
+\begin{frame}{New Approach: Ranges for $\varepsilon$ and $k$}
+    Let $k = [k_{min},k_{max}] = [3,5]$
+
+    and $\varepsilon = [\varepsilon_{min},\varepsilon_{max}] = [2,3.5]$
+
+    Now prune the table:
+
+    \only<1>{\begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \backslashbox{i}{k} & 1 & 2 & 3 & 4 & 5 \\
+        \hline
+        0 &  0 &  1.000000 &  1.000000 &  2.236068 &  4.123106\\
+        1 &  0 &  1.000000 &  1.414214 &  1.414214 &  4.000000\\
+        2 &  0 &  1.000000 &  1.414214 &  2.000000 &  3.162278\\
+        3 &  0 &  3.162278 &  4.000000 &  5.000000 &  5.000000\\
+        4 &  0 &  3.162278 &  3.162278 &  4.000000 &  4.123106\\
+        5 &  0 &  1.414214 &  2.000000 &  2.236068 &  3.162278\\
+        6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
+        \hline
+\end{tabular}}
+
+    \only<2>{\begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \backslashbox{i}{k} & 3 & 4 & 5 \\
+        \hline
+        0 & 1.000000 &  2.236068 &  4.123106\\
+        1 & 1.414214 &  1.414214 &  4.000000\\
+        2 & 1.414214 &  2.000000 &  3.162278\\
+        3 & 4.000000 &  5.000000 &  5.000000\\
+        4 & 3.162278 &  4.000000 &  4.123106\\
+        5 & 2.000000 &  2.236068 &  3.162278\\
+        6 & 5.000000 &  5.000000 &  6.403124\\
+        \hline
+\end{tabular}}
+
+
+    \only<3>{\begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \backslashbox{i}{k} & 3 & 4 & 5 \\
+        \hline
+        0 & 1.000000 &  2.236068 &  4.123106\\
+        1 & 1.414214 &  1.414214 &  4.000000\\
+        2 & const inlier \\
+        3 & const outlier \\
+        4 & 3.162278 &  4.000000 &  4.123106\\
+        5 & const inlier \\
+        6 & const outlier \\
+        \hline
+\end{tabular}}
+
+\end{frame}
+
 \end{document}
