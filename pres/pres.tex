@@ -95,7 +95,9 @@
     \begin{itemize}
         \item Good parameter setting not obvious. 
         \item Settings can not be tested on Subsets: \alert{Results will differ!}
-        \item Solution?
+        \item Solution?\pause
+
+        \item ONION (\underline{On}line Outlier Detect\underline{ion}) system: Store intermediate results.
     \end{itemize}
 \end{frame}
 \begin{frame}{A Small Example}
@@ -120,96 +122,277 @@
             \end{tabular}
         \end{column}
     \end{columns}
-    Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
+    Say we want to perform outlier detection with $k=4$ and $\varepsilon=3.5$
 \end{frame}
 \begin{frame}{A Small Example (cont'd)}
-    Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
+    Say we want to perform outlier detection with $k=4$ and $\varepsilon=3.5$
     $K$-Nearest-Neighbors query yields:
-    \begin{tabular}{|c|c|c|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|}
         \hline
-        \backslashbox{i}{k} & 1 & 2 & 3 & 4 & 5 \\
+        \backslashbox{i}{k} & 1 & 2 & 3 & 4 \\
         \hline
-        0 &  0 &  1.000000 &  1.000000 &  2.236068 &  4.123106\\
-        1 &  0 &  1.000000 &  1.414214 &  1.414214 &  4.000000\\
-        2 &  0 &  1.000000 &  1.414214 &  2.000000 &  3.162278\\
-        3 &  0 &  3.162278 &  4.000000 &  5.000000 &  5.000000\\
-        4 &  0 &  3.162278 &  3.162278 &  4.000000 &  4.123106\\
-        5 &  0 &  1.414214 &  2.000000 &  2.236068 &  3.162278\\
-        6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
+        0 &  0 &  1.000000 &  1.000000 &  2.236068 \\
+        1 &  0 &  1.000000 &  1.414214 &  1.414214 \\
+        2 &  0 &  1.000000 &  1.414214 &  2.000000\\
+        3 &  0 &  3.162278 &  4.000000 &  5.000000 \\
+        4 &  0 &  3.162278 &  3.162278 &  4.000000 \\
+        5 &  0 &  1.414214 &  2.000000 &  2.236068 \\
+        6 &  0 &  4.123106 &  5.000000 &  5.000000 \\
         \hline
      \end{tabular}
 \end{frame}
 \begin{frame}{A Small Example (cont'd)}
-    Say we want to perform outlier detection with $k=5$ and $\varepsilon=3.5$
+    Say we want to perform outlier detection with $k=4$ and $\varepsilon=3.5$
     $K$-Nearest-Neighbors query yields:
-    \begin{tabular}{|c|c|c|c|c|>{\columncolor[rgb]{1,0.5,0.5}}c|}
+    \begin{tabular}{|c|c|c|c|>{\columncolor[rgb]{1,0.5,0.5}}c|}
         \hline
-        \backslashbox{i}{k} & 1 & 2 & 3 & 4 & 5 \\
+        \backslashbox{i}{k} & 1 & 2 & 3 & 4 \\
         \hline
-        0 &  0 &  1.000000 &  1.000000 &  2.236068 &  4.123106\\
-        1 &  0 &  1.000000 &  1.414214 &  1.414214 &  4.000000\\
-        2 &  0 &  1.000000 &  1.414214 &  2.000000 &  3.162278\\
-        3 &  0 &  3.162278 &  4.000000 &  5.000000 &  5.000000\\
-        4 &  0 &  3.162278 &  3.162278 &  4.000000 &  4.123106\\
-        5 &  0 &  1.414214 &  2.000000 &  2.236068 &  3.162278\\
-        6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
+        0 &  0 &  1.000000 &  1.000000 &  2.236068 \\
+        1 &  0 &  1.000000 &  1.414214 &  1.414214 \\
+        2 &  0 &  1.000000 &  1.414214 &  2.000000\\
+        3 &  0 &  3.162278 &  4.000000 &  5.000000 \\
+        4 &  0 &  3.162278 &  3.162278 &  4.000000 \\
+        5 &  0 &  1.414214 &  2.000000 &  2.236068 \\
+        6 &  0 &  4.123106 &  5.000000 &  5.000000 \\
         \hline
      \end{tabular}
      \pause
 
      We can now re-use this table, right?\pause
-     Table size too big!
+
+     \alert{Table size too big!}
 \end{frame}
 \begin{frame}{New Approach: Ranges for $\varepsilon$ and $k$}
-    Let $k = [k_{min},k_{max}] = [3,5]$
+    Let $k = [k_{min},k_{max}] = [3,4]$
 
     and $\varepsilon = [\varepsilon_{min},\varepsilon_{max}] = [2,3.5]$
 
     Now prune the table:
 
-    \only<1>{\begin{tabular}{|c|c|c|c|c|c|}
+    \only<1>{\begin{tabular}{|c|c|c|c|c|}
         \hline
-        \backslashbox{i}{k} & 1 & 2 & 3 & 4 & 5 \\
+        \backslashbox{i}{k} & 1 & 2 & 3 & 4 \\
         \hline
-        0 &  0 &  1.000000 &  1.000000 &  2.236068 &  4.123106\\
-        1 &  0 &  1.000000 &  1.414214 &  1.414214 &  4.000000\\
-        2 &  0 &  1.000000 &  1.414214 &  2.000000 &  3.162278\\
-        3 &  0 &  3.162278 &  4.000000 &  5.000000 &  5.000000\\
-        4 &  0 &  3.162278 &  3.162278 &  4.000000 &  4.123106\\
-        5 &  0 &  1.414214 &  2.000000 &  2.236068 &  3.162278\\
-        6 &  0 &  4.123106 &  5.000000 &  5.000000 &  6.403124\\
+        0 &  0 &  1.000000 &  1.000000 &  2.236068 \\
+        1 &  0 &  1.000000 &  1.414214 &  1.414214 \\
+        2 &  0 &  1.000000 &  1.414214 &  2.000000 \\
+        3 &  0 &  3.162278 &  4.000000 &  5.000000 \\
+        4 &  0 &  3.162278 &  3.162278 &  4.000000 \\
+        5 &  0 &  1.414214 &  2.000000 &  2.236068 \\
+        6 &  0 &  4.123106 &  5.000000 &  5.000000 \\
         \hline
-\end{tabular}}
+    \end{tabular}}
 
-    \only<2>{\begin{tabular}{|c|c|c|c|c|c|}
+    \only<2>{\begin{tabular}{|c|c|c|}
         \hline
-        \backslashbox{i}{k} & 3 & 4 & 5 \\
+        \backslashbox{i}{k} & 3 & 4 \\
         \hline
-        0 & 1.000000 &  2.236068 &  4.123106\\
-        1 & 1.414214 &  1.414214 &  4.000000\\
-        2 & 1.414214 &  2.000000 &  3.162278\\
-        3 & 4.000000 &  5.000000 &  5.000000\\
-        4 & 3.162278 &  4.000000 &  4.123106\\
-        5 & 2.000000 &  2.236068 &  3.162278\\
-        6 & 5.000000 &  5.000000 &  6.403124\\
+        0 & 1.000000 &  2.236068 \\
+        1 & 1.414214 &  1.414214 \\
+        2 & 1.414214 &  2.000000 \\
+        3 & 4.000000 &  5.000000 \\
+        4 & 3.162278 &  4.000000 \\
+        5 & 2.000000 &  2.236068 \\
+        6 & 5.000000 &  5.000000 \\
         \hline
-\end{tabular}}
+    \end{tabular}}
 
-
-    \only<3>{\begin{tabular}{|c|c|c|c|c|c|}
+    \only<3>{\begin{tabular}{|c|c|c|}
         \hline
-        \backslashbox{i}{k} & 3 & 4 & 5 \\
+        \backslashbox{i}{k} & 3 & 4 \\
         \hline
-        0 & 1.000000 &  2.236068 &  4.123106\\
-        1 & 1.414214 &  1.414214 &  4.000000\\
-        2 & const inlier \\
-        3 & const outlier \\
-        4 & 3.162278 &  4.000000 &  4.123106\\
-        5 & const inlier \\
-        6 & const outlier \\
+        0 & 1.000000 &  2.236068 \\
+        1 & \multicolumn{2}{|c|}{\textit{Const Inlier}} \\
+        2 & \multicolumn{2}{|c|}{\textit{Const Inlier}} \\
+        3 & \multicolumn{2}{|c|}{\textit{Const Outlier}} \\
+        4 & 3.162278 &  4.000000 \\
+        5 & 2.000000 &  2.236068 \\
+        6 & \multicolumn{2}{|c|}{\textit{Const Outlier}} \\
         \hline
-\end{tabular}}
-
+    \end{tabular}}
+    \only<4>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|c|}
+                    \hline
+                    \backslashbox{i}{k} & 3 & 4 \\
+                    \hline
+                    0 & 1.000000 &  2.236068 \\
+                    1 & \multicolumn{2}{|c|}{\textit{Const Inlier}} \\
+                    2 & \multicolumn{2}{|c|}{\textit{Const Inlier}} \\
+                    3 & \multicolumn{2}{|c|}{\textit{Const Outlier}} \\
+                    4 & 3.162278 &  4.000000 \\
+                    5 & 2.000000 &  2.236068 \\
+                    6 & \multicolumn{2}{|c|}{\textit{Const Outlier}} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    
+    \only<5>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|c|}
+                    \hline
+                    \backslashbox{i}{k} & 3 & 4 \\
+                    \hline
+                    0 & 1.000000 &  2.236068 \\
+                    4 & 3.162278 &  4.000000 \\
+                    5 & 2.000000 &  2.236068 \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    \only<5>{We refer to this data structure as \textit{O-Space} (ONION Space).}
 \end{frame}
+\begin{frame}
+    Outlier Detection using \textit{O-Space} is still linear.
 
+    Can we do even better?\pause
+
+    Maybe with Sorting?
+\end{frame}
+\begin{frame}
+    \only<1>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|c|}
+                    \hline
+                    \backslashbox{i}{k} & 3 & 4 \\
+                    \hline
+                    0 & 1.000000 &  2.236068 \\
+                    4 & 3.162278 &  4.000000 \\
+                    5 & 2.000000 &  2.236068 \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    \only<2>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    3 & 4 \\
+                    \hline
+                    (0,1.000000) &  (0,2.236068) \\
+                    (4,3.162278) &  (4,4.000000) \\
+                    (5,2.000000) &  (5,2.236068) \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    \only<3>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    3 & 4 \\
+                    \hline
+                    (0,1.000000) &  (5,2.236068) \\
+                    (5,2.000000) &  (0,2.236068) \\
+                    (4,3.162278) &  (4,4.000000) \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    \end{frame}
+    \begin{frame}{Contributions of the ONION System}
+        \begin{itemize}
+            \item Really fast outlier detection 
+                \begin{itemize}
+                    \item By storing a large data structure in memory.
+                    \item After some initial setup time.
+                    \item For a limited parameter range.
+                \end{itemize}
+            \item What else?
+        \end{itemize}
+    \end{frame}
+    \begin{frame}{Other Useful Operations}
+    \begin{center}
+        \includegraphics[width=\textwidth]{images/south_america.png}
+    \end{center}
+    Guessing is one way to find a parameter setting. Should there be others?
+    \end{frame}
+                        
 \end{document}
