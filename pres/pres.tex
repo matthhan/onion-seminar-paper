@@ -394,13 +394,167 @@
     \end{center}
     Guessing is one way to find a parameter setting. Should there be others?
     \end{frame}
+\section{Comparative Outliers}
     \begin{frame}{Comparative Outliers}
-        Given a set of known outliers, which other points must also be outliers?
+        Given a set of outliers, which other points must also be outliers?
 
         Formally: Let P $\subseteq DB$. 
         
-        Find maximal Q, such that 
+        Find \alert<2>{maximal} Q, such that 
         
-        $\forall (k,\varepsilon) (\text{All points in P are outliers } \implies \text{All points in Q are outliers}$
+        $\forall (k,\varepsilon) (\text{All } p \in P \text{ are outliers } \implies \text{All } q \in Q \text{ are outliers})$
     \end{frame}
+    \begin{frame}
+    \only<1>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    3 & 4 \\
+                    \hline
+                    (0,1.000000) &  (5,2.236068) \\
+                    (5,2.000000) &  (0,2.236068) \\
+                    (4,3.162278) &  (4,4.000000) \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    \only<2>{
+        \begin{columns}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    3 & 4 \\
+                    \hline
+                    \cellcolor{blue} (0,1.000000) & \cellcolor{red} (5,2.236068) \\
+                    (5,2.000000)\cellcolor{red} &  \cellcolor{blue}(0,2.236068) \\
+                    \cellcolor{green} (4,3.162278) &  \cellcolor{green}(4,4.000000) \\
+                    \hline
+                \end{tabular}
+            \end{column}
+            \begin{column}{.5\textwidth}
+                \begin{tabular}{|c|c|}
+                    \hline
+                    id & class \\
+                    \hline
+                    0 & \textit{Outlier Candidate} \\
+                    1 & \textit{Const Inlier} \\
+                    2 & \textit{Const Inlier} \\
+                    3 & \textit{Const Outlier} \\
+                    4 & \textit{Outlier Candidate} \\
+                    5 & \textit{Outlier Candidate} \\
+                    6 & \textit{Const Outlier} \\
+                    \hline
+                \end{tabular}
+            \end{column}
+        \end{columns}
+    }
+    \end{frame}
+\begin{frame}{Counterexample}
+    \begin{columns}
+        \begin{column}{.7\textwidth}
+            \includegraphics[height=.8\textheight]{images/counterexample.png}
+        \end{column}
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{| c | c |} 
+                \hline
+                \multicolumn{2}{| c |}{k}\\ 
+                \hline
+                2 & 3\\
+                \hline
+                (5,0.5) & (2,1.5)\\ 
+                (6,0.5) & (5,1.5)\\ 
+                (1,1) & (4,2)\\ 
+                (2,1) & (6,2)\\ 
+                (3,1.5) & (1,2.5)\\ 
+                (4,1.5) & (3,2.5)\\ 
+                \hline
+            \end{tabular}
+        \end{column}
+    \end{columns}
+\end{frame}
+\begin{frame}{Counterexample}
+    \definecolor{einscol}{RGB}{241,97,96}
+    \definecolor{zweicol}{RGB}{168,144,31}
+    \definecolor{dreicol}{RGB}{38,176,54}
+    \definecolor{viercol}{RGB}{40,179,183}
+    \definecolor{funfcol}{RGB}{85,139,252}
+    \definecolor{sechscol}{RGB}{237,78,220}
+    \begin{columns}
+        \begin{column}{.7\textwidth}
+            \includegraphics[height=.8\textheight]{images/counterexample_color.png}
+        \end{column}
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{| c | c |} 
+                \hline
+                \multicolumn{2}{| c |}{k}\\ 
+                \hline
+                2 & 3\\
+                \hline
+                \cellcolor{funfcol}(5,0.5) & \cellcolor{zweicol}(2,1.5)\\ 
+                \cellcolor{sechscol}(6,0.5) & \cellcolor{funfcol}(5,1.5)\\ 
+                \cellcolor{einscol}(1,1) & \cellcolor{viercol}(4,2)\\ 
+                \cellcolor{zweicol}(2,1) & \cellcolor{sechscol}(6,2)\\ 
+              \cellcolor{dreicol}  (3,1.5) &\cellcolor{einscol} (1,2.5)\\ 
+                \cellcolor{viercol}(4,1.5) &\cellcolor{dreicol} (3,2.5)\\ 
+                \hline
+            \end{tabular}
+        \end{column}
+    \end{columns}
+\end{frame}
+\begin{frame}
+    \definecolor{einscol}{RGB}{241,97,96}
+    \definecolor{zweicol}{RGB}{168,144,31}
+    \definecolor{dreicol}{RGB}{38,176,54}
+    \definecolor{viercol}{RGB}{40,179,183}
+    \definecolor{funfcol}{RGB}{85,139,252}
+    \definecolor{sechscol}{RGB}{237,78,220}
+    \begin{columns}
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{| c | c |} 
+                \hline
+                \multicolumn{2}{| c |}{k}\\ 
+                \hline
+                2 & 3\\
+                \hline
+                \cellcolor{funfcol}(5,0.5) & \cellcolor{zweicol}(2,1.5)\\ 
+                \cellcolor{sechscol}(6,0.5) & \cellcolor{funfcol}(5,1.5)\\ 
+                \cellcolor{einscol}(1,1) & \cellcolor{viercol}(4,2)\\ 
+                \cellcolor{zweicol}(2,1) & \cellcolor{sechscol}(6,2)\\ 
+              \cellcolor{dreicol}  (3,1.5) &\cellcolor{einscol} (1,2.5)\\ 
+                \cellcolor{viercol}(4,1.5) &\cellcolor{dreicol} (3,2.5)\\ 
+                \hline
+            \end{tabular}
+        \end{column}
+        \begin{column}{.7\textwidth}
+            \textbf{K-Domination:}
+            
+            $p \leq_k q \iff $
+
+            $\forall\varepsilon (q\text{ is Outlier}\implies p\text{ is Outlier})$
+
+            \textbf{(Full) Domination:}
+
+            $p \leq q \iff $
+            
+            $\forall k (p \leq_k q)$
+        \end{column}
+    \end{columns}
+\end{frame}
 \end{document}
