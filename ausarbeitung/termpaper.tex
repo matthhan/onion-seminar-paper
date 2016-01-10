@@ -155,7 +155,7 @@ i & X1 & X2 \\
 \caption{Example Data Set}
 \end{figure}
 
-Its \emph{O-Space} data structure with the parameter set $([k_{min},k_{max}],[\varepsilon_{min},\varepsilon_{max}])=([2,5],[2,3.5])$ would look as follows:
+Its \emph{O-Space} data structure with the parameter set $([k_{min},k_{max}],[\varepsilon_{min},\varepsilon_{max}])=([2,4],[2,3.5])$ would look as follows:
 
 \begin{table}
 \caption{Example \emph{O-Space}}
@@ -242,7 +242,7 @@ To find the set of comparative outliers $Q$ for one set of input points $P$, usi
 
 \emph{P-Space} offers a straightforward improvement on this algorithm: since the distances for each $k$ are sorted, the part of the scan that considers each outlier candidate can be done in logarithmic time. Thus, time complexity will be in $\mathcal{O}(k\cdot \log(|OC|))$.
 
-Using \emph{O-Space} further reduces this complexity: Since it contains information about the domination relationship independent of the value of $k$, one only needs to search the domination lists for the weakest outlier in the input set $P$. All points preceding this point are then clearly comparative outliers. Since the domination lists are ordered, this search can be performed in logarithmic time, i.e. $\mathcal{O}(\log(n_1) + \ldots + \log(n_j))$, where $n_1, \ldots , n_j$ are the lengths of the domination lists as above.
+Using \emph{D-Space} further reduces this complexity: Since it contains information about the domination relationship independent of the value of $k$, one only needs to search the domination lists for the weakest outlier in the input set $P$. All points preceding this point are then clearly comparative outliers. Since the domination lists are ordered, this search can be performed in logarithmic time, i.e. $\mathcal{O}(\log(n_1) + \ldots + \log(n_j))$, where $n_1, \ldots , n_j$ are the lengths of the domination lists as above.
 \subsection{Outlier-Centric Parameter Space Exploration}
  
 For $\delta=0$, Outlier-Centric Parameter Space Exploration using \emph{O-Space} can be supported by finding the weakest outlier, i.e. the one that needs the lowest value of $\varepsilon$ to become an inlier, for each $k \in [k_{min},k_{max}]$. The time complexity of this is in $\mathcal{O}(|P| * |[k_{min}, k_{max}]|$, which is simply the summed-up cost of finding the weakest outlier for each $k$. In cases where $\delta \neq 0$, answering PSE with \emph{O-Space} requires sorting each individual row of \emph{O-Space}, which is already exactly the same as computing \emph{P-Space}.
