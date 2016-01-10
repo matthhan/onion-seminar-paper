@@ -3,6 +3,7 @@
 \usepackage{hyperref}
 \usepackage{diagbox}
 \usepackage{colortbl}
+\beamertemplatenavigationsymbolsempty
 
 
 
@@ -379,7 +380,7 @@
     \end{frame}
     \begin{frame}{Contributions}
         \begin{itemize}
-            \item Really fast outlier detection 
+            \item Logarithmic-time outlier detection 
                 \begin{itemize}
                     \item By storing a large data structure in memory.
                     \item After some initial setup time.
@@ -564,7 +565,7 @@
 \end{frame}
     \begin{frame}{Contributions}
         \begin{itemize}
-            \item Really fast Outlier Detection 
+            \item Logarithmic-time Outlier Detection 
                 \begin{itemize}
                     \item By storing a large data structure in memory.
                     \item After some initial setup time.
@@ -576,6 +577,54 @@
                     \item  $\mathcal{O}(|OC|)$ using D-Space (NP preprocessing).
                 \end{itemize}
             \item What else?
+        \end{itemize}
+    \end{frame}
+\begin{frame}
+    ``Backwards Search'' for Outliers:
+    
+    Find $(k,\varepsilon)$, such that a all $p\in P$ are Outliers 
+
+    (and the number of Outliers is minimal). \pause
+
+    \begin{center}
+    \begin{tabular}{| c | c |} 
+        \hline
+        \multicolumn{2}{| c |}{k}\\ 
+        \hline
+        2 & 3\\
+        \hline
+        (5,0.5) & (2,1.5)\\ 
+        (6,0.5) & (5,1.5)\\ 
+        (1,1) & (4,2)\\ 
+        (2,1) & (6,2)\\ 
+        (3,1.5) & (1,2.5)\\ 
+        (4,1.5) & (3,2.5)\\ 
+        \hline
+    \end{tabular}
+    \end{center}
+    \pause
+    \begin{itemize}
+    \item The Paper calls this ``Outlier-Centric Parameter Space Exploration'' (PSE).
+    \end{itemize}
+\end{frame}
+    \begin{frame}{Contributions}
+        \begin{itemize}
+            \item Logarithmic-time Outlier Detection 
+               \begin{itemize}
+                    \item By storing a large data structure in memory.
+                    \item After some initial setup time.
+                    \item For a limited parameter range.
+                \end{itemize}
+           \item Comparative Outliers
+                \begin{itemize}
+                    \item $\mathcal{O}(|OC| \cdot k)$ using P-Space.
+                    \item  $\mathcal{O}(|OC|)$ using D-Space (NP preprocessing).
+                \end{itemize}
+            \item Parameter Space Exploration
+                    \begin{itemize}
+                    \item $\mathcal{O}(|OC| \cdot k)$ using P-Space.
+                    \item $\mathcal{O}(k\cdot |P| + k \cdot \log(|OC|))$ using O-Space and P-Space.
+                   \end{itemize}
         \end{itemize}
     \end{frame}
     
