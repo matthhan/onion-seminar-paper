@@ -4,15 +4,18 @@
 \usepackage{diagbox}
 \usepackage{colortbl}
 \beamertemplatenavigationsymbolsempty
+\setbeamertemplate{bibliography item}[triangle]
 
 
 
 \title{Online Outlier Exploration over Large Datasets}
-\author{Matthias Hansen \\
-        \texttt{matthias.hansen@rwth-aachen.de}}
-\date{Data Mining and Multimedia Search}
+\author{Matthias Hansen \texttt{(matthias.hansen@rwth-aachen.de)} \\
+        Advisor: Dr. Ines F\"arber}
+\date{Seminar on Data Mining and Multimedia Search\\
+        10.02.2015}
 \institute{RWTH Aachen University}
 \begin{document}
+
 \frame{\titlepage}
 
 \begin{frame}{Motivation}
@@ -81,7 +84,7 @@
 \begin{frame}{Performance Considerations}
     \begin{itemize}
         \item Naive: Calculate pairwise distances. Check criterion for each point.
-        \item Better: Insert data into spatial Index structure. 
+        \item Better: Insert data into spatial index structure. 
 
               Compute $k$-nearest neighbors. 
 
@@ -597,7 +600,7 @@
             \item Comparative Outliers
                 \begin{itemize}
                     \item $\mathcal{O}(|OC| \cdot k)$ using P-Space.
-                    \item  $\mathcal{O}(|OC|)$ using preprocessing with \textsc{Cliques}.
+                    \item  $\mathcal{O}(\log(comp_1)+\log(comp_2)\ldots)$ D-Space and referring to O-Space.
                 \end{itemize}
             \item What else?
         \end{itemize}
@@ -642,7 +645,7 @@
            \item Comparative Outliers
                 \begin{itemize}
                     \item $\mathcal{O}(|OC| \cdot k)$ using P-Space.
-                    \item  $\mathcal{O}(|OC|)$ using preprocessing with \textsc{Cliques}.
+                    \item  $\mathcal{O}(\log(comp_1)+\log(comp_2)\ldots)$ D-Space and referring to O-Space.
                 \end{itemize}
             \item Parameter Space Exploration
                     \begin{itemize}
@@ -651,5 +654,22 @@
                    \end{itemize}
         \end{itemize}
     \end{frame}
-    
+\begin{frame}{Criticism}
+\begin{itemize}
+\item Only really applicable if data fits into memory of a single machine.
+\item Preprocessing takes long.
+\item Results of preprocessing useless unless parameters chosen carefully.
+\item D-Space construction only useful when $k_{max} - k_{min}$ very big.
+\end{itemize}
+\end{frame}
+\appendix
+\begin{frame}{References}
+\nocite{onion,dolphin,parallel_knn,kriegeldefinitions}
+\def\newblock{}
+\bibliographystyle{plain}
+\bibliography{References}
+\end{frame}    
+
+
+
 \end{document}
