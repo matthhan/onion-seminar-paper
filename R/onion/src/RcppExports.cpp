@@ -17,3 +17,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// binary_search_closest
+int binary_search_closest(NumericVector vec, double val);
+RcppExport SEXP Onion_binary_search_closest(SEXP vecSEXP, SEXP valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type vec(vecSEXP);
+    Rcpp::traits::input_parameter< double >::type val(valSEXP);
+    __result = Rcpp::wrap(binary_search_closest(vec, val));
+    return __result;
+END_RCPP
+}

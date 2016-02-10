@@ -1,83 +1,64 @@
 #'@export
 construct_pspace <- function(ospace) {
-  pnode <- function(oc_id,eps) {
-    return(c(oc_id,eps))#We would return a nice fancy object here, but doing so would make constructing pspace much slower
+  indices <- t(sapply(ospace$oc_ids,rep,length(ospace$k[1]:ospace$k[2])))
+  epsvalues <- ospace$space_delimiter
+  new_ordering <- apply(epsvalues,2,order)
+  apply_ordering <- function(vec,ordering){vec[ordering]}
+  for(i in 1:ncol(indices)) {
+    indices[,i] <- apply_ordering(indices[,i],new_ordering[,i])
   }
-  construct_kth_list <- function(k) {
-    kth_list <- ospace$space_delimiter[,k-(ospace$k[1]-1)]
-    kth_list <- lapply(1:length(kth_list),function(index) {pnode(oc_id=ospace$oc_ids[index],eps=kth_list[index])})
-    #Make a vector containing only the epsilon values for each pnode
-    eps_values  <- sapply(kth_list,function(pnode){pnode[2]})
-    #Now we can sort the kth_list by eps value
-    kth_list <- kth_list[order(eps_values)]
-    return(kth_list)
+  for(i in 1:ncol(epsvalues)) {
+    epsvalues[,i] <- apply_ordering(epsvalues[,i],new_ordering[,i])
   }
-  p_space <- lapply(ospace$k[1]:ospace$k[2],construct_kth_list)  
-  p_space <- structure(class="P-Space",list(p_space=p_space,
-                                            k=ospace$k,
-                                            eps=ospace$eps,
-                                            assignment=ospace$assignment,
-                                            oc_ids=ospace$oc_ids))
+  pspace <- structure(class="P-Space",list(indices=indices,
+                                           epsvalues=epsvalues,
+                                           k=ospace$k,
+                                           assignment=ospace$assignment,
+                                           oc_ids=ospace$oc_ids))
 }
-#'@export
+#'@export 
 detect_outliers_pspace <- function(pspace,k,eps) {
-  k_th_list <- pspace$p_space[[k-(pspace$k[1]-1)]]
-  k_th_list_epsvals <- sapply(k_th_list,function(pnode){pnode[2]})
-  binary_search_first_smaller <- function(x,vec) { 
-    binary_search_first_smaller_helper <- function(x,vec,interval) {
-      interval_length <- abs(interval[2]-interval[1])
-      if(interval_length==1) {
-        if(vec[interval[2]] < x) return(interval[2])
-        else return(interval[1])
-      }
-      else{
-        next_to_check <- floor(interval[1] + interval_length/2)
-        if(vec[next_to_check] < x) {
-          return(binary_search_first_smaller_helper(x,vec,c(next_to_check,interval[2])))
-        } else return(binary_search_first_smaller_helper(x,vec,c(interval[1],next_to_check)))
-      }
-    }
-    binary_search_first_smaller_helper(x,vec,c(1,length(vec)))
-  }
-  first_smaller <- binary_search_first_smaller(eps,k_th_list_epsvals)
-  inlier_pnodes <- k_th_list[1:first_smaller]
-  inlier_ids <- sapply(inlier_pnodes,function(pnode){pnode[1]})
+  translated_k <- k-(pspace$k[1]-1)
+  vector_to_search_in <- pspace$epsvalues[,translated_k]
+  separating_index <- binary_search_closest(vector_to_search_in,eps)  
+  outlier_ids<- pspace$indices[separating_index:nrow(pspace$indices),translated_k]
   res <- pspace$assignment
-  res[inlier_ids] <- "inlier"
-  res[res=="outlier_candidate"]  <- "outlier"
+  res[outlier_ids] <- "outlier"
+  res[res=="outlier_candidate"]  <- "inlier"
   return(res)
 }
 #'@export
 comparative_outlier_analytics_pspace <- function(pspace,set_of_ocs) {
-  comparative_outliers_by_k <- lapply(pspace$p_space,function(k_th_list) {
-    #First find out where the set_of_ocs are in k_th_list
-    only_oc_ids <- sapply(k_th_list,function(pnode){pnode[1]})
+  comparative_outliers_by_k <- apply(pspace$indices,2,function(k_th_list) {
+    only_oc_ids <- k_th_list  
     indices <- which(sapply(only_oc_ids,function(oc_id){oc_id %in% set_of_ocs}))
     #now find out the last of these
-    last_index_in_set_of_ocs <- max(indices)
+    first_index_in_set_of_ocs <- min(indices)
     #find out which oc_ids are listed behind the last of these ocs in k_th_list
-    relevant_pnodes <- k_th_list[last_index_in_set_of_ocs:length(k_th_list)]
-    only_the_oc_ids <- sapply(relevant_pnodes,function(pnode){pnode[1]})
-    return(only_the_oc_ids)
+    res <- k_th_list[first_index_in_set_of_ocs:length(k_th_list)]
+    return(res)
   })
-  return(Reduce(intersect,comparative_outliers_by_k))
-  
+  indices_comparative_outliers <- Reduce(intersect,comparative_outliers_by_k)
+  assnvec <- pspace$assignment
+  assnvec[indices_comparative_outliers] <- "outlier"
+  assnvec[assnvec == "outlier_candidate"] <- "inlier"
+  return (assnvec)
 }
 #'@export
-outlier_centric_parameter_space_exploration_pspace <- function(pspace,input_set,ospace,delta) {
-  real_indexes <- which(sapply(pspace$oc_ids,function(oc_id){oc_id %in% input_set}))
-  minimum_ocs <- sapply(1:ncol(ospace$space_delimiter),function(k) {
-    index_of_min <- ospace$oc_ids[real_indexes[which.min(ospace$space_delimiter[real_indexes,k])]]
+outlier_centric_parameter_space_exploration_pspace<- function(pspace,input_set,ospace,delta) {
+  first_outliers_by_k <- apply(pspace$indices,2,function(k_th_list) {
+    only_oc_ids <- k_th_list  
+    indices <- which(sapply(only_oc_ids,function(oc_id){oc_id %in% input_set}))
+    #now find out the last of these
+    first_index_in_set_of_ocs <- min(indices)
+    return(first_index_in_set_of_ocs)
   })
-  minimum_ocs_as_indexes_into_pspace <- sapply(1:length(minimum_ocs),function(i){
-    which(sapply(pspace$p_space[[i]],"[",1) == minimum_ocs[i])
-  })  
-  #We could use any element of p_space here. 1 is just used because it is most likely there
-  number_ocs <- length(pspace$p_space[[1]])
-  number_outliers_with_input_set <- number_ocs - minimum_ocs_as_indexes_into_pspace
-  number_outliers_wanted <- floor((1 - delta) * number_outliers_with_input_set)
-  first_outlier <- number_ocs - number_outliers_wanted
-  epsvalues <- sapply(1:length(first_outlier),function(i){pspace$p_space[[i]][[first_outlier[[i]]]][2]})
-  result <- sapply(1:length(epsvalues),function(i){list(eps=epsvalues[i],k=(ospace$k[1]:ospace$k[2])[i])})
-  return(result)
+  res <- list()
+  for(i in 1:length(pspace$k[1]:pspace$k[2])) {
+    k <- (pspace$k[1]:pspace$k[2])[i]
+    epsilon <- pspace$epsvalues[first_outliers_by_k[i],i]
+    newparamsetting <- list(k=k,epsilon=epsilon)
+    res[[i]]  <- newparamsetting
+  }
+  return(res)  
 }

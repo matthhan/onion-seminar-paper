@@ -5,3 +5,7 @@ make_domination_graph <- function(pspace, list_oc_ids) {
     .Call('Onion_make_domination_graph', PACKAGE = 'Onion', pspace, list_oc_ids)
 }
 
+binary_search_closest <- function(vec, val) {
+    .Call('Onion_binary_search_closest', PACKAGE = 'Onion', vec, val)
+}
+
