@@ -8,6 +8,7 @@ bool dominates_by_transitivity(int i, int j, LogicalMatrix graph);
 bool dominates_by_pspace(int i, int j,IntegerMatrix pspace,IntegerVector list_oc_ids);
 bool k_dominates_by_pspace(int i, int j,IntegerMatrix pspace,IntegerVector list_oc_ids,int k);
 void printpspace(IntegerMatrix pspace);
+int binary_search_rek(NumericVector vec, double val,int lower,int upper);
 // [[Rcpp::export]]
 LogicalMatrix make_domination_graph(IntegerMatrix pspace,IntegerVector list_oc_ids) {
     LogicalMatrix output(pspace.ncol(),pspace.ncol());
@@ -63,5 +64,27 @@ void printpspace(IntegerMatrix pspace) {
             cout << pspace(i,j) << ",";
         }
         cout << endl;
+    }
+}
+// [[Rcpp::export]]
+int binary_search_closest(NumericVector vec,double val) {
+    return binary_search_rek(vec,val,0,vec.length()-1);
+}
+int binary_search_rek(NumericVector vec, double val,int lower,int upper) {
+    if(lower > upper) {
+        return -1;
+    }
+    if(lower == upper || lower+1 == upper) {
+        return upper;
+    }
+    const int middle = lower + ((upper - lower) /2);
+    //std::cout << middle << "," << vec(middle) << endl;
+    if(vec(middle) == val) {
+        return middle;
+    }
+    if(vec(middle) > val) {
+        return binary_search_rek(vec,val,lower,middle-1);
+    } else {
+        return binary_search_rek(vec,val,middle+1,upper);
     }
 }
