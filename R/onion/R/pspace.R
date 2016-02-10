@@ -13,6 +13,7 @@ construct_pspace <- function(ospace) {
   pspace <- structure(class="P-Space",list(indices=indices,
                                            epsvalues=epsvalues,
                                            k=ospace$k,
+                                           eps=ospace$eps,
                                            assignment=ospace$assignment,
                                            oc_ids=ospace$oc_ids))
 }
