@@ -61,3 +61,9 @@ $class
 > system.time(dspace <- construct_dspace(pspace))
    user  system elapsed 
   0.084   0.000   0.083 
+> length(which(ospace$assignment=="outlier_candidate"))
+[1] 6238
+> system.time(dspace <- construct_dspace(pspace))
+    user   system  elapsed 
+3076.496    1.712 3078.886 
+> 
