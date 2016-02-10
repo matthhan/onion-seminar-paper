@@ -67,13 +67,17 @@ comparative_outlier_analytics_pspace <- function(pspace,set_of_ocs) {
 outlier_centric_parameter_space_exploration_pspace <- function(pspace,input_set,ospace,delta) {
   real_indexes <- which(sapply(pspace$oc_ids,function(oc_id){oc_id %in% input_set}))
   minimum_ocs <- sapply(1:ncol(ospace$space_delimiter),function(k) {
-    index_of_min <- ospace$oc_ids[real_indexes[which.max(ospace$space_delimiter[real_indexes,k])]]
+    index_of_min <- ospace$oc_ids[real_indexes[which.min(ospace$space_delimiter[real_indexes,k])]]
   })
   minimum_ocs_as_indexes_into_pspace <- sapply(1:length(minimum_ocs),function(i){
     which(sapply(pspace$p_space[[i]],"[",1) == minimum_ocs[i])
   })  
-  delta_applied <- floor(minimum_ocs_as_indexes_into_pspace*delta)
-  epsvalues <- sapply(1:length(delta_applied),function(i){pspace$p_space[[i]][[delta_applied[[i]]]][2]})
+  #We could use any element of p_space here. 1 is just used because it is most likely there
+  number_ocs <- length(pspace$p_space[[1]])
+  number_outliers_with_input_set <- number_ocs - minimum_ocs_as_indexes_into_pspace
+  number_outliers_wanted <- floor((1 - delta) * number_outliers_with_input_set)
+  first_outlier <- number_ocs - number_outliers_wanted
+  epsvalues <- sapply(1:length(first_outlier),function(i){pspace$p_space[[i]][[first_outlier[[i]]]][2]})
   result <- sapply(1:length(epsvalues),function(i){list(eps=epsvalues[i],k=(ospace$k[1]:ospace$k[2])[i])})
   return(result)
 }
