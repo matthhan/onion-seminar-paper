@@ -1,5 +1,4 @@
 
-#'@export 
 #Import something from Rcpp. We do not use this function but we have to import
 #something from Rcpp, otherwise calling into cpp does not work
 #'@importFrom Rcpp sourceCpp
@@ -15,18 +14,18 @@ construct_dspace <- function(pspace) {
   domination_groups <- lapply(cliques,function(clique){pspace$oc_ids[clique]})
   domination_groups <- lapply(domination_groups,function(domgroup){
     #Fetch one set of k_th_list. It does not matter which. Take only the oc_ids
-    one_set_of_pnodes <- sapply(pspace$p_space[[1]],function(pnode){pnode[2]})
+    one_set_of_pnodes <- sapply(pspace$p_space[[1]],function(pnode){pnode[1]})
     #now we want to sort domgroup in the same order as one_set_of_pnodes.
     #It does not seem like the standard R 'sort' and 'order' functions can do this
     #For now, we use a relatively inefficient sorting algorithm
-    for(i in 1:length(one_set_of_pnodes)) {
-      position_in_domgroup <- which(one_set_of_pnodes[i]==domgroup)
-      if(length(position_in_domgroup)==0) next
-      else {
-        #swap the values. I know that we could do addswap, but this algorithm is not final anyway
-        temp <- domgroup[i]
-        domgroup[i] <- domgroup[position_in_domgroup]
-        domgroup[position_in_domgroup] <- temp
+    position_in_pnodes_smaller <- function(x,y) {which(one_set_of_pnodes==x) < which(one_set_of_pnodes==y)}
+    for(bubble_sort_counter in 1:(length(domgroup)-1)) {
+      for(i in (bubble_sort_counter+1):length(domgroup)) {
+        if(position_in_pnodes_smaller(domgroup[i],domgroup[i-1])) {
+          temp <- domgroup[i]
+          domgroup[i] <- domgroup[i-1]
+          domgroup[i-1] <- temp
+        }
       }
     }
     return(domgroup)
@@ -43,6 +42,7 @@ construct_dspace <- function(pspace) {
 #previous R implementation took far too long. For e.g. 100000 2d data points,
 #the R implementation took 2 minutes, while the cpp implementation was finished
 #in half a second
+#'@export
 build_domination_graph <- function(pspace) {
   #First we have to format the pspace structure in such a way that the cpp program can use it
   list_oc_ids <- pspace$oc_ids

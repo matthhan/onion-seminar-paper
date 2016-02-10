@@ -34,3 +34,5 @@ ausarbeitung/*.doc
 *.pdf
 *.snm
 *.toc
+*.bbl
+*.blg
